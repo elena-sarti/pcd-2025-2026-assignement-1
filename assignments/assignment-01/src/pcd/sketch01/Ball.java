@@ -8,7 +8,7 @@ public class Ball {
     private double mass;   
     
     private static double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
-    private static double RESTITUTION_FACTOR = 1; 
+    private static double RESTITUTION_FACTOR = 1; // mi dice quanto è elastico l'urto
 
     public Ball(P2d pos, double radius, double mass, V2d vel){
        this.pos = pos;
@@ -21,14 +21,14 @@ public class Ball {
         double speed = vel.abs();
         double dt_scaled = dt*0.001;
     	if (speed > 0.001) {
-            double dec    = FRICTION_FACTOR * dt_scaled;
+            double dec    = FRICTION_FACTOR * dt_scaled; //decelerazione costante
             double factor = Math.max(0, speed - dec) / speed;
             vel = vel.mul(factor);
         } else {
         	vel = new V2d(0,0);
         }
         pos = pos.sum(vel.mul(dt_scaled));
-     	applyBoundaryConstraints(ctx);
+     	applyBoundaryConstraints(ctx); //ho coordinate logiche, non pixel: siamo nel model
     }
     
     public void kick(V2d vel) {
@@ -128,7 +128,7 @@ public class Ball {
 	        	
 	        	double imp = -(1 + RESTITUTION_FACTOR) * dvn / (1.0/a.getMass() + 1.0/b.getMass());        
 	        	a.vel = new V2d(a.vel.x() - (imp / a.mass) * nx, a.vel.y() - (imp / a.mass) * ny);                
-	        	b.vel = new V2d(b.vel.x() + (imp / b.mass) * nx, a.vel.y() + (imp / b.mass) * ny);
+	        	b.vel = new V2d(b.vel.x() + (imp / b.mass) * nx, b.vel.y() + (imp / b.mass) * ny);
 	        }
         }
     }

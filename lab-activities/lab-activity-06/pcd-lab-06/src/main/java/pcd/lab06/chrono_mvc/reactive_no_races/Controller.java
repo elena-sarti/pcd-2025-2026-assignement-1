@@ -13,7 +13,7 @@ public class Controller {
 	}
 	
 	public void notifyStarted() {
-		agent = new CounterAgent(counter, stopFlag, DELTA_TIME);
+		agent = new CounterAgent(counter, stopFlag, DELTA_TIME); //non chiama metodi dell'EDT => non fa fare all'EDT cose che non gli appartengono
 		agent.start();				
 	}
 	

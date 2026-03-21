@@ -78,8 +78,8 @@ public class CounterGUI extends JFrame
 	}
 	
 	public void counterChanged(final CounterEvent ev){
-		SwingUtilities.invokeLater(()-> {
-			display.setText(""+ ev.getValue());
+		SwingUtilities.invokeLater(()-> { //invokeLater si mette NON PER AUMENTARE LA REATTIVITA' DELLA GUI. QUI E' PER EVITARE CORSE CRITICHE
+			display.setText(""+ ev.getValue()); //devo essere sicuro che sia l'EDT ad eseguirlo
 		});
 	}
 	

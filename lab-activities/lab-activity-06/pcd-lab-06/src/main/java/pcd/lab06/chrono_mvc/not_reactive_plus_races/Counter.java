@@ -3,7 +3,9 @@ package pcd.lab06.chrono_mvc.not_reactive_plus_races;
 import java.util.*;
 
 public class Counter {
-	
+	/*
+	è un monitor
+	 */
 	private ArrayList<CounterEventListener> listeners;
 	private int cont;
 	private int base;

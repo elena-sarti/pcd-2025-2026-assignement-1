@@ -28,7 +28,7 @@ public class ViewFrame extends JFrame implements KeyListener {
         getContentPane().add(panel);
         this.viewModel = viewModel;
 
-		this.addKeyListener(this);
+		this.addKeyListener(this); //volgio ascolatre le pressioni dei pulsanti fatte su questo componente
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
 		requestFocusInWindow(); 
@@ -69,8 +69,8 @@ public class ViewFrame extends JFrame implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (e.getExtendedKeyCode() == KeyEvent.VK_I){
-			controller.notifyNewCmd(new IncCmd());
+		if (e.getExtendedKeyCode() == KeyEvent.VK_I){ //l'evento porta con se il codice del tasto che l'ha generato
+			controller.notifyNewCmd(new IncCmd()); //notifico il controller con un comando: COMMAND PATTERN
 		} else if (e.getExtendedKeyCode() == KeyEvent.VK_R){
 			controller.notifyNewCmd(new ResetCmd());
 		}

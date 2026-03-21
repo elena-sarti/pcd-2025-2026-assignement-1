@@ -27,7 +27,7 @@ public class View implements CounterObserver {
 	
 	@Override
 	public synchronized void modelUpdated(Counter model) {
-		viewModel.update(model.getCount());
-		frame.refresh();
+		viewModel.update(model.getCount()); // pericoloso: può causare deadlock - questa chiamata viene fatta da dentro un monitor
+		frame.refresh(); //ogni volta che è aggiornato il contatore è aggiornato il modello della view poi chiamato il refresh sul frame
 	}
 }

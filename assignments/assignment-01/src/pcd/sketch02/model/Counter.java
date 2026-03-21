@@ -15,7 +15,7 @@ public class Counter {
 		observers = new ArrayList<>();
 	}
 	
-	public void addObserver(CounterObserver o) {
+	public synchronized void addObserver(CounterObserver o) {
 		observers.add(o);
 	}
 	

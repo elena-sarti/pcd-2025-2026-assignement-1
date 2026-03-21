@@ -5,7 +5,11 @@ import pcd.sketch02.util.BoundedBuffer;
 import pcd.sketch02.util.BoundedBufferImpl;
 
 public class ActiveController extends Thread {
-
+    /*
+    CONTROLLER ATTIVO: riceve input asincroni e fa le sue cose => architettura produttore consumatore.
+    Quando riceve un comando lo esegue. Può non essere bloccante: impiegato in un main loop - se non c'è un comando fa altro
+    In questa versione è bloccante
+     */
 	private BoundedBuffer<Cmd> cmdBuffer;
 	private Counter counter;
 	
@@ -28,7 +32,7 @@ public class ActiveController extends Thread {
 		}
 	}
 	
-	public void notifyNewCmd(Cmd cmd) {
+	public void notifyNewCmd(Cmd cmd) { //metodo pubblico, ma mette solo il comando dentro al buffer.
 		try {
 			cmdBuffer.put(cmd);
 		} catch (Exception ex) {

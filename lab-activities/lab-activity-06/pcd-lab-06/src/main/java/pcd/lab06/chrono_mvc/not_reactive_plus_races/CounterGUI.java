@@ -54,7 +54,7 @@ public class CounterGUI extends JFrame
 			}
 		});
 
-		start.addActionListener(this);
+		start.addActionListener(this); //devo registrare l'oggetto come ascoltatore sul pulsante start/stop
 		stop.addActionListener(this);
 		reset.addActionListener(this);
 		counter.addListener(this);
