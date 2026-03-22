@@ -32,7 +32,18 @@ public class LargeBoardConf implements BoardConf {
     	return balls;
 	}
 
-	public Boundary getBoardBoundary() {
+    @Override
+    public List<Hole> getHoles(){
+        var holes = new ArrayList<Hole>();
+        var h1 = new Hole(new P2d(-1.5, 1.0), 0.3);
+        var h2 = new Hole(new P2d(1.5, 1.0), 0.3);
+        holes.add(h1);
+        holes.add(h2);
+        return holes;
+    }
+
+    @Override
+    public Boundary getBoardBoundary() {
         return new Boundary(-1.5,-1.0,1.5,1.0);
 	}
 }

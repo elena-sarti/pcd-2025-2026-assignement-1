@@ -21,7 +21,7 @@ public class MassiveBoardConf implements BoardConf {
 		var ballRadius = 0.01;
         var balls = new ArrayList<Ball>();
 
-    	for (int row = 0; row < 50; row++) {
+    	for (int row = 0; row < 30; row++) {
     		for (int col = 0; col < 150; col++) {
         		var px = -1.0 + col*0.015;
         		var py =  row*0.015;
@@ -32,7 +32,18 @@ public class MassiveBoardConf implements BoardConf {
     	return balls;
 	}
 
-	public Boundary getBoardBoundary() {
+    @Override
+    public List<Hole> getHoles(){
+        var holes = new ArrayList<Hole>();
+        var h1 = new Hole(new P2d(-1.5, 1.0), 0.3);
+        var h2 = new Hole(new P2d(1.5, 1.0), 0.3);
+        holes.add(h1);
+        holes.add(h2);
+        return holes;
+    }
+
+    @Override
+    public Boundary getBoardBoundary() {
         return new Boundary(-1.5,-1.0,1.5,1.0);
 	}
 }

@@ -56,7 +56,7 @@ public class AutonomousUpdater extends Thread{
     }
 
     private static long kickBall(Ball b, long lastKickTime){
-        var rand = new Random(2);
+        var rand = new Random();
         var angle = rand.nextDouble() * Math.PI * 0.25;
         var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1);
         b.kick(v); //assegno quella velocità alla pallina ferma
@@ -66,7 +66,7 @@ public class AutonomousUpdater extends Thread{
 
     private static void waitAbit(){
         try {
-            Thread.sleep(30);
+            Thread.sleep(20);
         } catch (Exception ex) {}
     }
 }

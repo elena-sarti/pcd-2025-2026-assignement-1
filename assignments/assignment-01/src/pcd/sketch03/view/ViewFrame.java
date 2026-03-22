@@ -77,7 +77,18 @@ public class ViewFrame extends JFrame {
 	                int radiusY = (int)(b.radius()*delta);
 	                g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
 	    		}
-	
+
+                g2.setStroke(new BasicStroke(1));
+                for (var h: model.getHoles()) {
+                    var p = h.pos();
+                    int x0 = (int)(ox + p.x()*delta);
+                    int y0 = (int)(oy - p.y()*delta);
+                    int radiusX = (int)(h.radius()*delta);
+                    int radiusY = (int)(h.radius()*delta);
+                    g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
+                    g2.fillOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
+                }
+
     		    g2.setStroke(new BasicStroke(3));
 	    		var pb = model.getPlayerBall();
 	    		if (pb != null) {
@@ -89,6 +100,9 @@ public class ViewFrame extends JFrame {
 	                g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
                     int textWidth = fm.stringWidth("P");
                     int textHeight = fm.getAscent();
+                    g2.setColor(Color.PINK);
+                    g2.fillOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
+                    g2.setColor(Color.BLACK);
                     g2.drawString("P", x0 - (textWidth / 2), y0 + (textHeight / 2));
 	    		}
 
@@ -103,12 +117,15 @@ public class ViewFrame extends JFrame {
                     g2.drawOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
                     int textWidth = fm.stringWidth("B");
                     int textHeight = fm.getAscent();
+                    g2.setColor(Color.CYAN);
+                    g2.fillOval(x0 - radiusX,y0 - radiusY,radiusX*2,radiusY*2);
+                    g2.setColor(Color.BLACK);
                     g2.drawString("B", x0 - (textWidth / 2), y0 + (textHeight / 2));
                 }
-    		    
+
     		    g2.setStroke(new BasicStroke(1));
-	    		g2.drawString("Num small balls: " + model.getBalls().size(), 20, 40);
-	    		g2.drawString("Frame per sec: " + model.getFramePerSec(), 20, 60);
+	    		g2.drawString("Num small balls: " + model.getBalls().size(), 10, 740);
+	    		g2.drawString("Frame per sec: " + model.getFramePerSec(), 10, 760);
 
 	    		sync.notifyFrameRendered();
     		

@@ -17,6 +17,7 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     private Ball playerBall;
     private Ball botBall;
     private Boundary bounds;
+    private List<Hole> holes;
     List<Worker> workers;
     CollisionMonitor monitor;
 
@@ -28,6 +29,7 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     	playerBall = conf.getPlayerBall();
         botBall = conf.getBotBall();
     	bounds = conf.getBoardBoundary();
+        holes = conf.getHoles();
         workers = new ArrayList<>();
         monitor = new CollisionMonitor(balls.size());
     }
@@ -78,5 +80,9 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     
     public  Boundary getBounds(){
         return bounds;
+    }
+
+    public List<Hole> getHoles(){
+        return holes;
     }
 }

@@ -8,12 +8,12 @@ public class MinimalBoardConf implements BoardConf {
 
 	@Override
 	public Ball getPlayerBall() {
-    	return new Ball(new P2d(0, 0), 0.06, 1, new V2d(0,0.5));
+    	return new Ball(new P2d(-0.5, 0), 0.06, 1, new V2d(0,0.5));
 	}
 
     @Override
     public Ball getBotBall() {
-        return new Ball(new P2d(1, 0), 0.06, 1, new V2d(0,0.5));
+        return new Ball(new P2d(0.5, 0), 0.06, 1, new V2d(0,0.5));
     }
 
 	@Override
@@ -25,6 +25,16 @@ public class MinimalBoardConf implements BoardConf {
     	balls.add(b2);
     	return balls;
 	}
+
+    @Override
+    public List<Hole> getHoles(){
+        var holes = new ArrayList<Hole>();
+        var h1 = new Hole(new P2d(-1.5, 1.0), 0.3);
+        var h2 = new Hole(new P2d(1.5, 1.0), 0.3);
+        holes.add(h1);
+        holes.add(h2);
+        return holes;
+    }
 
 	@Override
 	public Boundary getBoardBoundary() {

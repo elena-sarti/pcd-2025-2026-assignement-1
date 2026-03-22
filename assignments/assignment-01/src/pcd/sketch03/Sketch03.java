@@ -8,8 +8,8 @@ public class Sketch03 {
     public static void main(String[] args){
 
         //var boardConf = new MinimalBoardConf();
-        var boardConf = new LargeBoardConf();
-        //var boardConf = new MassiveBoardConf();
+        //var boardConf = new LargeBoardConf();
+        var boardConf = new MassiveBoardConf();
 
         Board board = new Board();
         board.init(boardConf);

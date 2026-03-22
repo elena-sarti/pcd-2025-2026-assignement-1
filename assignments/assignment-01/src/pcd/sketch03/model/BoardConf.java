@@ -8,6 +8,8 @@ import java.util.List;
 public interface BoardConf {
 
 	Boundary getBoardBoundary();
+
+    List<Hole> getHoles();
 	
 	Ball getPlayerBall();
 
