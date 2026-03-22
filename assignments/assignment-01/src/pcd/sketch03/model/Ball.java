@@ -1,15 +1,20 @@
 package pcd.sketch03.model;
 
 
+import java.util.ArrayList;
+
 public class Ball {
 
     private P2d pos;
     private V2d vel;
     private double radius;
     private double mass;
+    private volatile boolean inHole = false;
+    private static String lastToCollide = "";
 
     private static double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
-    private static double RESTITUTION_FACTOR = 1; // mi dice quanto è elastico l'urto
+    private static double RESTITUTION_FACTOR = 1; // mi dice quanto è elastico l'urto.
+
 
     public Ball(P2d pos, double radius, double mass, V2d vel){
         this.pos = pos;
@@ -29,6 +34,11 @@ public class Ball {
             vel = new V2d(0,0);
         }
         pos = pos.sum(vel.mul(dt_scaled));
+
+        if (checkInHole(ctx.getBounds())){
+            this.setInHole(true);
+            return;
+        }
         applyBoundaryConstraints(ctx); //ho coordinate logiche, non pixel: siamo nel model
     }
 
@@ -65,8 +75,11 @@ public class Ball {
      *
      * @param a
      * @param b
+     * @param ballIndex: the index of the small ball
+     * @param ballType: the type of the big ball colliding with the small one: if it gets in a hole, we need to know which player
+     *                sent it in.
      */
-    public static void resolveCollision(Ball a, Ball b) {
+    public static void resolveCollision(Ball a, Ball b, int ballIndex, String ballType) {
         // define the order of the locks basing on the hashcode to prevent deadlock
         Ball first = (a.hashCode() < b.hashCode()) ? a : b;
         Ball second = (first == b) ? a : b;
@@ -82,7 +95,11 @@ public class Ball {
 
                 /* compute dv = b.pos - a.pos vector */
                 if (dist < minD && dist > 1e-6) {
-
+                    if (ballType.equals("bot")){
+                        lastToCollide = "bot";
+                    } else if (ballType.equals("player")) {
+                        lastToCollide = "player";
+                    }
                     /*
                      * Collision case - what to do:
                      * 1) solve overlaps, moving balls
@@ -131,6 +148,15 @@ public class Ball {
     }
 
 
+    public boolean checkInHole(Boundary b){
+        double r = this.radius;
+        // Tolleranza leggermente maggiore del raggio per "risucchiare" la palla
+        double threshold = r * 1.5;
+        double distLeft = Math.hypot(pos.x() - b.x0(), pos.y() - b.y0());
+        double distRight = Math.hypot(pos.x() - b.x1(), pos.y() - b.y0());
+        return distLeft < threshold || distRight < threshold;
+    }
+
     public P2d getPos(){
         return pos;
     }
@@ -147,4 +173,14 @@ public class Ball {
         return radius;
     }
 
+    public void setInHole(boolean b){
+        inHole = b;
+    }
+
+    public boolean getInHole(){
+        return inHole;
+    }
+     public String getLastToCollide(){
+        return lastToCollide;
+     }
 }

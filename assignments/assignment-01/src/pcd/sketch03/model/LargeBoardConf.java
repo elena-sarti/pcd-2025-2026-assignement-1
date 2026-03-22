@@ -13,7 +13,7 @@ public class LargeBoardConf implements BoardConf {
 
     @Override
     public Ball getBotBall() {
-        return new Ball(new P2d(1, 0), 0.05, 1.5, new V2d(0,0.5));
+        return new Ball(new P2d(0, -0.75), 0.05, 1.5, new V2d(0,0.5));
     }
 
 	@Override

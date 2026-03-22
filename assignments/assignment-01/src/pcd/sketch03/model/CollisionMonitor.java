@@ -5,7 +5,7 @@ import java.util.*;
 public class CollisionMonitor {
 
         private int currentIndex = 0;
-        private final int maxIndex;
+        private int maxIndex;
 
         public CollisionMonitor(int numBalls) {
             this.maxIndex = numBalls - 1;
@@ -18,7 +18,8 @@ public class CollisionMonitor {
             return -1;
         }
 
-        public synchronized void reset() {
+        public synchronized void reset(int newMaxIndex) {
+            this.maxIndex = newMaxIndex;
             currentIndex = 0;
         }
     }

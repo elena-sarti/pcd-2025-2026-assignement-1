@@ -4,6 +4,7 @@ import pcd.sketch03.model.Ball;
 import pcd.sketch03.model.BoardConf;
 import pcd.sketch03.model.Boundary;
 
+import javax.management.monitor.CounterMonitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,7 +20,11 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     private Boundary bounds;
     private List<Hole> holes;
     List<Worker> workers;
-    CollisionMonitor monitor;
+    private int countPlayer = 0;
+    private int countBot = 0;
+    CollisionMonitor collisionMonitor;
+    pcd.sketch03.model.CounterMonitor counterMonitor;
+
 
     
     public Board(){} 
@@ -31,24 +36,23 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     	bounds = conf.getBoardBoundary();
         holes = conf.getHoles();
         workers = new ArrayList<>();
-        monitor = new CollisionMonitor(balls.size());
+        collisionMonitor = new CollisionMonitor(balls.size());
+        counterMonitor = new pcd.sketch03.model.CounterMonitor(countPlayer, countBot);
     }
     
     public void updateState(long dt) {
 
     	playerBall.updateState(dt, this);
-
         botBall.updateState(dt, this);
-    	
     	for (var b: balls) {
     		b.updateState(dt, this);
     	}
 
-        monitor.reset();
+        collisionMonitor.reset(balls.size());
 
         List<Worker> workers = new ArrayList<>();
         for (int i = 0; i < nThreads; i++) {
-            Worker w = new Worker(balls, playerBall, botBall, monitor);
+            Worker w = new Worker(this, collisionMonitor, counterMonitor);
             workers.add(w);
             w.start();
         }
@@ -63,7 +67,17 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
             } catch (InterruptedException e) {
             }
         }
-         Ball.resolveCollision(botBall, playerBall);
+        balls.removeIf(b -> {
+            if (b.getInHole()) {
+                counterMonitor.inc(b.getLastToCollide());
+                return true;
+            }
+            return false;
+        });
+        System.out.println("Palline rimaste: " + balls.size());
+
+        Ball.resolveCollision(botBall, playerBall, -1, "");
+
     }
     
     public List<Ball> getBalls(){
