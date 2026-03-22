@@ -1,5 +1,6 @@
 package pcd.sketch03.model;
 
+import pcd.sketch03.view.View;
 import pcd.sketch03.view.ViewModel;
 
 import java.util.Random;
@@ -8,10 +9,12 @@ public class AutonomousUpdater extends Thread{
 
     private ViewModel viewModel;
     private Board board;
+    private View view;
 
-    public AutonomousUpdater(ViewModel viewModel, Board board){
+    public AutonomousUpdater(ViewModel viewModel, Board board, View view){
         this.viewModel = viewModel;
         this.board = board;
+        this.view = view;
     }
 
     public void run() {
@@ -26,12 +29,12 @@ public class AutonomousUpdater extends Thread{
             var bb = board.getBotBall();
 
             /* if the player ball is stopped and 5 secs have elapsed, then kick the player ball */
-            if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTimePB > 2000) {
+            if (pb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTimePB > 200) {
                 lastKickTimePB = kickBall(pb, lastKickTimePB);
             }
 
             /* if the bot ball is stopped and 5 secs have elapsed, then kick the bot ball */
-            if (bb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTimeBB > 2000) {
+            if (bb.getVel().abs() < 0.05 && System.currentTimeMillis() - lastKickTimeBB > 200) {
                 lastKickTimeBB = kickBall(bb, lastKickTimeBB);
             }
 
@@ -47,6 +50,7 @@ public class AutonomousUpdater extends Thread{
             }
 
             viewModel.update(board, framePerSec);
+            view.render();
             waitAbit();
         }
     }
@@ -54,7 +58,7 @@ public class AutonomousUpdater extends Thread{
     private static long kickBall(Ball b, long lastKickTime){
         var rand = new Random(2);
         var angle = rand.nextDouble() * Math.PI * 0.25;
-        var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1.5);
+        var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1);
         b.kick(v); //assegno quella velocità alla pallina ferma
         lastKickTime = System.currentTimeMillis();
         return lastKickTime;
@@ -62,7 +66,7 @@ public class AutonomousUpdater extends Thread{
 
     private static void waitAbit(){
         try {
-            Thread.sleep(20);
+            Thread.sleep(30);
         } catch (Exception ex) {}
     }
 }

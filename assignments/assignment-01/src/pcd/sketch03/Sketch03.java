@@ -7,8 +7,8 @@ public class Sketch03 {
 
     public static void main(String[] args){
 
-        var boardConf = new MinimalBoardConf();
-        //var boardConf = new LargeBoardConf();
+        //var boardConf = new MinimalBoardConf();
+        var boardConf = new LargeBoardConf();
         //var boardConf = new MassiveBoardConf();
 
         Board board = new Board();
@@ -17,10 +17,8 @@ public class Sketch03 {
         ViewModel viewModel = new ViewModel();
         View view = new View(viewModel, 1200, 800);
 
-        var updater = new AutonomousUpdater(viewModel, board);
-        var renderer = new Renderer(view);
+        var updater = new AutonomousUpdater(viewModel, board, view);
 
         updater.start();
-        renderer.start();
     }
 }

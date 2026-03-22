@@ -4,16 +4,22 @@ import pcd.sketch03.model.Ball;
 import pcd.sketch03.model.BoardConf;
 import pcd.sketch03.model.Boundary;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Board {
 /*
 quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle palline
  */
+    private static final int nThreads = Runtime.getRuntime().availableProcessors() + 1;
     private List<Ball> balls;
     private Ball playerBall;
     private Ball botBall;
     private Boundary bounds;
+    List<Worker> workers;
+    CollisionMonitor monitor;
+
     
     public Board(){} 
     
@@ -22,6 +28,8 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     	playerBall = conf.getPlayerBall();
         botBall = conf.getBotBall();
     	bounds = conf.getBoardBoundary();
+        workers = new ArrayList<>();
+        monitor = new CollisionMonitor(balls.size());
     }
     
     public void updateState(long dt) {
@@ -32,20 +40,28 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     	
     	for (var b: balls) {
     		b.updateState(dt, this);
-    	}       	
-    	
-    	for (int i = 0; i < balls.size() - 1; i++) { //controllo se ho collisione con le altre palline. Fatto una sola volta per coppia
-            for (int j = i + 1; j < balls.size(); j++) {
-                Ball.resolveCollision(balls.get(i), balls.get(j)); //per ogni coppia di palline si devono risolvere collisioni se ci sono. PUNTO IMPORTANTE
-            }
+    	}
+
+        monitor.reset();
+
+        List<Worker> workers = new ArrayList<>();
+        for (int i = 0; i < nThreads; i++) {
+            Worker w = new Worker(balls, playerBall, botBall, monitor);
+            workers.add(w);
+            w.start();
         }
 
-    	for (var b: balls) {
-    		Ball.resolveCollision(playerBall, b); //nell'assignment va fatto per le due palle grandi. Più thread/task per farlo
-            Ball.resolveCollision(botBall, b);
-    	} 
-
-        Ball.resolveCollision(botBall, playerBall);
+        /*
+        need to wait for all collisions to be resolved before resolving the collision within the
+         two big balls
+         */
+        for (Worker w : workers) {
+            try {
+                w.join();
+            } catch (InterruptedException e) {
+            }
+        }
+         Ball.resolveCollision(botBall, playerBall);
     }
     
     public List<Ball> getBalls(){
