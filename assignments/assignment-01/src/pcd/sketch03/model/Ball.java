@@ -10,7 +10,7 @@ public class Ball {
     private double radius;
     private double mass;
     private volatile boolean inHole = false;
-    private static String lastToCollide = "";
+    private String lastToCollide = "";
 
     private static double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
     private static double RESTITUTION_FACTOR = 1; // mi dice quanto è elastico l'urto.
@@ -24,6 +24,11 @@ public class Ball {
     }
 
     public void updateState(long dt, Board ctx){
+        if (this.inHole) {
+            this.vel = new V2d(0, 0);
+            return;
+        }
+
         double speed = vel.abs();
         double dt_scaled = dt*0.001;
         if (speed > 0.001) {
@@ -37,6 +42,7 @@ public class Ball {
 
         if (checkInHole(ctx.getBounds())){
             this.setInHole(true);
+            this.vel = new V2d(0,0);
             return;
         }
         applyBoundaryConstraints(ctx); //ho coordinate logiche, non pixel: siamo nel model
@@ -81,6 +87,7 @@ public class Ball {
      */
     public static void resolveCollision(Ball a, Ball b, int ballIndex, String ballType) {
         // define the order of the locks basing on the hashcode to prevent deadlock
+        if (a.getInHole()) return;
         Ball first = (a.hashCode() < b.hashCode()) ? a : b;
         Ball second = (first == b) ? a : b;
 
@@ -96,9 +103,9 @@ public class Ball {
                 /* compute dv = b.pos - a.pos vector */
                 if (dist < minD && dist > 1e-6) {
                     if (ballType.equals("bot")){
-                        lastToCollide = "bot";
+                        a.setLastToCollide("bot");
                     } else if (ballType.equals("player")) {
-                        lastToCollide = "player";
+                        a.setLastToCollide("player");
                     }
                     /*
                      * Collision case - what to do:
@@ -149,12 +156,29 @@ public class Ball {
 
 
     public boolean checkInHole(Boundary b){
+        // 1. RECUPERA LE COORDINATE REALI
+        double px = pos.x();
+        double py = pos.y();
         double r = this.radius;
-        // Tolleranza leggermente maggiore del raggio per "risucchiare" la palla
-        double threshold = r * 1.5;
-        double distLeft = Math.hypot(pos.x() - b.x0(), pos.y() - b.y0());
-        double distRight = Math.hypot(pos.x() - b.x1(), pos.y() - b.y0());
-        return distLeft < threshold || distRight < threshold;
+
+        // Definiamo una tolleranza fissa basata sulla scala del tuo mondo (-1.5 a 1.5)
+        // 0.20 è una misura che "aggancia" bene la palla senza essere troppo punitiva
+        double tolerance = 0.60;
+
+        // Controllo se è vicina al bordo superiore
+        boolean nearTop = Math.abs(py - b.y0()) < tolerance;
+
+        // Controllo se è vicina a uno dei due angoli laterali
+        boolean nearLeft = Math.abs(px - b.x0()) < tolerance;
+        boolean nearRight = Math.abs(px - b.x1()) < tolerance;
+
+        if (nearTop && (nearLeft || nearRight)) {
+            // Se entra qui, la palla DEVE sparire
+            this.setInHole(true);
+            return true;
+        }
+
+        return false;
     }
 
     public P2d getPos(){
@@ -180,6 +204,11 @@ public class Ball {
     public boolean getInHole(){
         return inHole;
     }
+
+    public void setLastToCollide(String last){
+        lastToCollide = last;
+    }
+
      public String getLastToCollide(){
         return lastToCollide;
      }

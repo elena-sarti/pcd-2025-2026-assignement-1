@@ -67,6 +67,10 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
             } catch (InterruptedException e) {
             }
         }
+        //debug
+//        if (!balls.isEmpty()) {
+//            balls.get(0).setInHole(true);
+//        }
         balls.removeIf(b -> {
             if (b.getInHole()) {
                 counterMonitor.inc(b.getLastToCollide());
