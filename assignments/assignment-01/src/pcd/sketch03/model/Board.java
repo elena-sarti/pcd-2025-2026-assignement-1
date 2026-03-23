@@ -4,7 +4,6 @@ import pcd.sketch03.model.Ball;
 import pcd.sketch03.model.BoardConf;
 import pcd.sketch03.model.Boundary;
 
-import javax.management.monitor.CounterMonitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,11 +18,11 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     private Ball botBall;
     private Boundary bounds;
     private List<Hole> holes;
-    List<Worker> workers;
-    private int countPlayer = 0;
-    private int countBot = 0;
+    List<CollisionWorker> workers;
+    private volatile boolean gameOver = false;
+    private String endMessage = "";
     CollisionMonitor collisionMonitor;
-    pcd.sketch03.model.CounterMonitor counterMonitor;
+    CountMonitor counterMonitor;
 
 
     
@@ -37,22 +36,37 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
         holes = conf.getHoles();
         workers = new ArrayList<>();
         collisionMonitor = new CollisionMonitor(balls.size());
-        counterMonitor = new pcd.sketch03.model.CounterMonitor(countPlayer, countBot);
+        counterMonitor = new CountMonitor();
     }
     
     public void updateState(long dt) {
+        if (this.gameOver) {
+            return;
+        }
 
     	playerBall.updateState(dt, this);
+        if (playerBall.isInHole()) {
+            gameOver = true;
+            endMessage = "GAME OVER - you lost :(";
+            return;
+        }
+
         botBall.updateState(dt, this);
+        if (botBall.isInHole()) {
+            gameOver = true;
+            endMessage = "GAME OVER - YOU WON!";
+            return;
+        }
+
     	for (var b: balls) {
     		b.updateState(dt, this);
     	}
 
         collisionMonitor.reset(balls.size());
 
-        List<Worker> workers = new ArrayList<>();
+        List<CollisionWorker> workers = new ArrayList<>();
         for (int i = 0; i < nThreads; i++) {
-            Worker w = new Worker(this, collisionMonitor, counterMonitor);
+            CollisionWorker w = new CollisionWorker(this, collisionMonitor, counterMonitor);
             workers.add(w);
             w.start();
         }
@@ -61,24 +75,26 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
         need to wait for all collisions to be resolved before resolving the collision within the
          two big balls
          */
-        for (Worker w : workers) {
+        for (CollisionWorker w : workers) {
             try {
                 w.join();
             } catch (InterruptedException e) {
             }
         }
-        //debug
-//        if (!balls.isEmpty()) {
-//            balls.get(0).setInHole(true);
-//        }
+
         balls.removeIf(b -> {
-            if (b.getInHole()) {
+            if (b.isInHole()) {
                 counterMonitor.inc(b.getLastToCollide());
                 return true;
             }
             return false;
         });
-        System.out.println("Palline rimaste: " + balls.size());
+
+        if ( balls.isEmpty() ){
+            gameOver = true;
+            endMessage = counterMonitor.getPlayerScore() > counterMonitor.getBotScore() ? "GAME OVER - YOU WON!" : "GAME OVER - you lost :(" ;
+            return;
+        }
 
         Ball.resolveCollision(botBall, playerBall, -1, "");
 
@@ -102,5 +118,13 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
 
     public List<Hole> getHoles(){
         return holes;
+    }
+
+    public boolean isGameOver(){
+        return gameOver;
+    }
+
+    public String getEndMessage(){
+        return endMessage;
     }
 }

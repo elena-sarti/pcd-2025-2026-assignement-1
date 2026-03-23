@@ -2,6 +2,7 @@ package pcd.sketch03.model;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Ball {
 
@@ -40,7 +41,7 @@ public class Ball {
         }
         pos = pos.sum(vel.mul(dt_scaled));
 
-        if (checkInHole(ctx.getBounds())){
+        if (checkInHole(ctx.getHoles())){
             this.setInHole(true);
             this.vel = new V2d(0,0);
             return;
@@ -87,7 +88,7 @@ public class Ball {
      */
     public static void resolveCollision(Ball a, Ball b, int ballIndex, String ballType) {
         // define the order of the locks basing on the hashcode to prevent deadlock
-        if (a.getInHole()) return;
+        if (a.isInHole()) return;
         Ball first = (a.hashCode() < b.hashCode()) ? a : b;
         Ball second = (first == b) ? a : b;
 
@@ -155,29 +156,22 @@ public class Ball {
     }
 
 
-    public boolean checkInHole(Boundary b){
-        // 1. RECUPERA LE COORDINATE REALI
-        double px = pos.x();
-        double py = pos.y();
-        double r = this.radius;
+    public boolean checkInHole(List<Hole> holes){
+        for (Hole h : holes) {
+            double dx = pos.x() - h.getPos().x();
+            double dy = pos.y() - h.getPos().y();
+            double distSq = dx*dx + dy*dy; // Uso il quadrato della distanza per velocità
 
-        // Definiamo una tolleranza fissa basata sulla scala del tuo mondo (-1.5 a 1.5)
-        // 0.20 è una misura che "aggancia" bene la palla senza essere troppo punitiva
-        double tolerance = 0.60;
+            // La palla cade se la distanza tra i centri è minore della somma dei raggi
+            // Puoi aggiungere un piccolo "margine di risucchio" (es. * 1.2)
+            double minFoundDist = Math.pow(h.getRadius() + this.radius, 2);
 
-        // Controllo se è vicina al bordo superiore
-        boolean nearTop = Math.abs(py - b.y0()) < tolerance;
-
-        // Controllo se è vicina a uno dei due angoli laterali
-        boolean nearLeft = Math.abs(px - b.x0()) < tolerance;
-        boolean nearRight = Math.abs(px - b.x1()) < tolerance;
-
-        if (nearTop && (nearLeft || nearRight)) {
-            // Se entra qui, la palla DEVE sparire
-            this.setInHole(true);
-            return true;
+            if (distSq < minFoundDist) {
+                this.setInHole(true);
+                this.vel = new V2d(0, 0); // Fermala subito
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -201,7 +195,7 @@ public class Ball {
         inHole = b;
     }
 
-    public boolean getInHole(){
+    public boolean isInHole(){
         return inHole;
     }
 

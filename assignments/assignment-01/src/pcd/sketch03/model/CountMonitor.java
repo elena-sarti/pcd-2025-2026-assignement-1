@@ -2,14 +2,9 @@ package pcd.sketch03.model;
 
 import java.util.Objects;
 
-public class CounterMonitor {
-    private int countPlayer;
-    private int countBot;
-
-    public CounterMonitor(int countPlayer, int countBot){
-        this.countBot = countBot;
-        this.countPlayer = countPlayer;
-    }
+public class CountMonitor {
+    private int countPlayer = 0;
+    private int countBot = 0;
 
     public synchronized void inc(String lastToCollide) {
         if (Objects.equals(lastToCollide, "player")) {

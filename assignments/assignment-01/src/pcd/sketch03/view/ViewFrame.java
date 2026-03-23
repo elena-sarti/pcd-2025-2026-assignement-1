@@ -61,7 +61,7 @@ public class ViewFrame extends JFrame {
     		g2.setRenderingHint(RenderingHints.KEY_RENDERING,
     		          RenderingHints.VALUE_RENDER_QUALITY);
     		g2.clearRect(0,0,this.getWidth(),this.getHeight());
-            
+
     		g2.setColor(Color.LIGHT_GRAY);
 		    g2.setStroke(new BasicStroke(1));
     		g2.drawLine(ox,0,ox,oy*2);
@@ -127,6 +127,22 @@ public class ViewFrame extends JFrame {
 	    		g2.drawString("Num small balls: " + model.getBalls().size(), 10, 740);
 	    		g2.drawString("Frame per sec: " + model.getFramePerSec(), 10, 760);
 
+                if (model.isGameOver()) {
+
+                    g2.setColor(new Color(255, 192, 203, 180));
+                    g2.fillRect(0, 0, getWidth(), getHeight());
+
+                    g2.setColor(Color.BLACK);
+                    g2.setFont(new Font("Arial", Font.BOLD, 40));
+
+                    String endMessage = model.getEndMessage();
+
+                    FontMetrics fmEnd = g2.getFontMetrics();
+                    int x = (getWidth() - fmEnd.stringWidth(endMessage)) / 2;
+                    int y = getHeight() / 2;
+
+                    g2.drawString(endMessage, x, y);
+                }
 	    		sync.notifyFrameRendered();
     		
         }

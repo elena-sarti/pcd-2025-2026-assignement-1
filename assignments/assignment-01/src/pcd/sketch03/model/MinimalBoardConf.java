@@ -29,8 +29,8 @@ public class MinimalBoardConf implements BoardConf {
     @Override
     public List<Hole> getHoles(){
         var holes = new ArrayList<Hole>();
-        var h1 = new Hole(new P2d(-1.5, 1.0), 0.3);
-        var h2 = new Hole(new P2d(1.5, 1.0), 0.3);
+        var h1 = new Hole(new P2d(-1.5, 1.0), 0.2);
+        var h2 = new Hole(new P2d(1.5, 1.0), 0.2);
         holes.add(h1);
         holes.add(h2);
         return holes;

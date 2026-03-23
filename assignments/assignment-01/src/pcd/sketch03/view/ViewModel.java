@@ -13,6 +13,8 @@ public class ViewModel {
     private BallViewInfo bot;
     private ArrayList<BallViewInfo> holes;
 	private int framePerSec;
+    private volatile boolean gameOver = false;
+    private String endMessage = "";
 	
 	public ViewModel() {
 		balls = new ArrayList<BallViewInfo>();
@@ -21,6 +23,8 @@ public class ViewModel {
 	}
 	
 	public synchronized void update(Board board, int framePerSec) {
+        this.gameOver = board.isGameOver();
+        this.endMessage = board.getEndMessage();
         holes.clear();
         for (var h: board.getHoles()) {
             holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
@@ -60,4 +64,11 @@ public class ViewModel {
         return bot;
     }
 
+    public synchronized boolean isGameOver(){
+        return gameOver;
+    }
+
+    public synchronized String getEndMessage(){
+        return endMessage;
+    }
 }
