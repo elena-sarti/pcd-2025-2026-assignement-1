@@ -1,70 +1,104 @@
 package pcd.sketch03.model;
 
 import javax.management.monitor.CounterMonitor;
+import java.util.ArrayList;
 import java.util.List;
 
-public class CollisionWorker extends Thread{
+public class CollisionWorker extends Thread {
 
-    CollisionMonitor collisionMonitor;
-    CountMonitor counterMonitor;
-    private List<Ball> balls;
+    private final CollisionMonitor collisionMonitor;
+    private final CountMonitor counterMonitor;
+    private final Board board;
+    private final int id;
+    private final int nThreads;
     private Ball pb;
     private Ball bb;
     private List<Hole> holes;
-    private Board board;
 
-    public CollisionWorker(Board board, CollisionMonitor collisionMonitor, CountMonitor counterMonitor){
+    public CollisionWorker(Board board, CollisionMonitor collisionMonitor, CountMonitor counterMonitor, int id, int nThreads) {
         this.board = board;
-        balls = board.getBalls();
-        pb = board.getPlayerBall();
-        bb = board.getBotBall();
-        holes = board.getHoles();
         this.collisionMonitor = collisionMonitor;
         this.counterMonitor = counterMonitor;
+        this.id = id;
+        this.nThreads = nThreads;
+        this.pb = board.getPlayerBall();
+        this.bb = board.getBotBall();
+        this.holes = board.getHoles();
     }
 
-    public void run(){
-        int index;
+    public void run() {
+        while (true) {
+            collisionMonitor.waitForOrder();
+            resolveCollisionInMySlice();
+            collisionMonitor.notifyWorkDone();
+        }
+    }
 
-        while( (index = collisionMonitor.getIndex()) >=0 ){
-           Ball b1 = balls.get(index);
-            boolean fellInHole = false;
-
-            if (b1.isInHole()){
-                continue; // Salta al prossimo indice del monitor
-            }
-
-            for (int j = index + 1; j < balls.size(); j++) { //to avoid updating twice the same couple, index i is confronted only with indexes j > i
-                Ball b2 = balls.get(j);
-                if (b2.isInHole()) continue;
-                Ball.resolveCollision(b1, b2, "");
-
-                if (b1.checkInHole(holes)) {
-                    handleHole(b1);
-                    fellInHole = true;
-                    break;
+    private void resolveCollisionInMySlice() {
+        int rows = board.getGridRows();
+        int rowsPerThread = rows / nThreads;
+        int startRow = id * rowsPerThread;
+        int endRow = (id == nThreads - 1) ? rows : startRow + rowsPerThread;
+        for (int r = startRow; r < endRow; r++) {
+            for (int c = 0; c < board.getGridCols(); c++) {
+                List<Ball> currentCell = board.getGridCell(r, c);
+                List<Ball> cellSnapshot;
+                //need to have a copy of the currentCell to do operations on, otherwise other threads could access it at the same time => race conditions
+                synchronized(currentCell){
+                    cellSnapshot = new ArrayList<>(currentCell);
                 }
-            }
-
-            if (fellInHole) {
-                continue;
-            }
-
-            Ball.resolveCollision(b1, pb, "player");
-            if (b1.checkInHole(holes)) {
-                handleHole(b1);
-                continue;
-            }
-
-            Ball.resolveCollision(b1, bb, "bot");
-            if (b1.checkInHole(holes)) {
-                handleHole(b1);
+                for (Ball b1 : cellSnapshot) {
+                    if (b1 == null || b1.isInHole()) continue;
+                    checkLocalCollisions(b1, r, c);
+                    if (b1.isInHole()) continue;
+                    //in order to access the method safely, we need to get the lock on the playerball
+                    synchronized(pb) {
+                        Ball.resolveCollision(b1, pb, "player");
+                    }
+                    if (checkAndHandleHole(b1)) continue;
+                    //the same applies also to solve the collision with the botball
+                    synchronized(bb) {
+                        Ball.resolveCollision(b1, bb, "bot");
+                    }
+                    checkAndHandleHole(b1);
+                }
             }
         }
     }
 
-    private void handleHole(Ball b) {
-        b.setInHole(true);
-        counterMonitor.inc(b.getLastToCollide());
+    private void checkLocalCollisions(Ball b1, int r, int c) {
+        // the check is made with the current cell and the 8 that are beside it.
+        for (int dr = -1; dr <= 1; dr++) {
+            for (int dc = -1; dc <= 1; dc++) {
+                List<Ball> cell = board.getGridCell(r + dr, c + dc);
+                List<Ball> snapshot;
+                synchronized(cell){
+                    snapshot = new ArrayList<>(cell);
+                }
+                for (Ball b2 : snapshot) {
+                    if (b1 == null) break;
+                    if (b2 == null || b1 == b2 || b2.isInHole()) continue;
+                    // to avoid deadlock, we need to determine the order of the lock, based on the hashcode
+                    Ball first = b1.hashCode() < b2.hashCode() ? b1 : b2;
+                    Ball second = (first == b1) ? b2 : b1;
+                    synchronized(first){
+                        synchronized(second) {
+                            // Chiamata alla tua funzione originale (intatta!)
+                            Ball.resolveCollision(b1, b2, "");
+                        }
+                    }
+                    if (checkAndHandleHole(b1)) return;
+                }
+            }
+        }
+    }
+
+    private boolean checkAndHandleHole(Ball b) {
+        if (b.checkInHole(holes)) {
+            b.setInHole(true);
+            counterMonitor.inc(b.getLastToCollide());
+            return true;
+        }
+        return false;
     }
 }

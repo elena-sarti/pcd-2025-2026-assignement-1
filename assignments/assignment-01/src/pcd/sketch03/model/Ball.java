@@ -29,7 +29,6 @@ public class Ball {
             this.vel = new V2d(0, 0);
             return;
         }
-
         double speed = vel.abs();
         double dt_scaled = dt*0.001;
         if (speed > 0.001) {
@@ -40,7 +39,6 @@ public class Ball {
             vel = new V2d(0,0);
         }
         pos = pos.sum(vel.mul(dt_scaled));
-
         if (checkInHole(ctx.getHoles())){
             this.setInHole(true);
             this.vel = new V2d(0,0);
@@ -86,72 +84,48 @@ public class Ball {
      *                sent it in.
      */
     public static void resolveCollision(Ball a, Ball b, String ballType) {
-        // define the order of the locks basing on the hashcode to prevent deadlock
         if (a.isInHole()) return;
-        Ball first = (a.hashCode() < b.hashCode()) ? a : b;
-        Ball second = (first == b) ? a : b;
-
-        synchronized (first) {
-            synchronized (second) {
-
-                /* check if there is a collision */
-                double dx = second.pos.x() - first.pos.x();
-                double dy = second.pos.y() - first.pos.y();
-                double dist = Math.hypot(dx, dy);
-                double minD = first.radius + second.radius;
-
-                /* compute dv = b.pos - a.pos vector */
-                if (dist < minD && dist > 1e-6) {
-
-                    setCollider(a, b, ballType);
-
-                    /*
-                     * Collision case - what to do:
-                     * 1) solve overlaps, moving balls
-                     * 2) update velocities
-                     */
-                    double nx = dx / dist;
-                    double ny = dy / dist;
-
-                    /*
-                     *
-                     * Update positions to solve overlaps, moving balls along dvn
-                     * - the displacements is proportional to the mass
-                     *
-                     */
-                    double overlap = minD - dist;
-                    double totalM = first.mass + second.mass;
-
-                    double first_factor = overlap * (second.mass / totalM);
-                    double first_deltax = nx * first_factor;
-                    double first_deltay = ny * first_factor;
-
-                    first.pos = new P2d(first.getPos().x() - first_deltax, first.getPos().y() - first_deltay);
-
-                    double second_factor = overlap * (first.mass / totalM);
-                    double second_deltax = nx * second_factor;
-                    double second_deltay = ny * second_factor;
-
-                    second.pos = new P2d(second.getPos().x() + second_deltax, second.getPos().y() + second_deltay);
-
-                    /* Update velocities */
-
-                    /* relative speed along the normal vector*/
-                    double dvx = second.vel.x() - first.vel.x();
-                    double dvy = second.vel.y() - first.vel.y();
-                    double dvn = dvx * nx + dvy * ny;
-
-                    if (dvn <= 0) { /* if not already separating, update velocities */
-                        double imp = -(1 + RESTITUTION_FACTOR) * dvn / (1.0 / first.getMass() + 1.0 / second.getMass());
-
-                        first.vel = new V2d(first.vel.x() - (imp / first.mass) * nx, first.vel.y() - (imp / first.mass) * ny);
-                        second.vel = new V2d(second.vel.x() + (imp / second.mass) * nx, second.vel.y() + (imp / second.mass) * ny);
-                    }
-                }
+        /* check if there is a collision */
+        double dx = b.pos.x() - a.pos.x();
+        double dy = b.pos.y() - a.pos.y();
+        double dist = Math.hypot(dx, dy);
+        double minD = a.radius + b.radius;
+        /* compute dv = b.pos - a.pos vector */
+        if (dist < minD && dist > 1e-6) {
+            setCollider(a, b, ballType);
+            /*
+             * Collision case - what to do:
+             * 1) solve overlaps, moving balls
+             * 2) update velocities
+             */
+            double nx = dx / dist;
+            double ny = dy / dist;
+            /*
+             * Update positions to solve overlaps, moving balls along dvn
+             * - the displacements is proportional to the mass
+             */
+            double overlap = minD - dist;
+            double totalM = a.mass + b.mass;
+            double a_factor = overlap * (b.mass / totalM);
+            double a_deltax = nx * a_factor;
+            double a_deltay = ny * a_factor;
+            a.pos = new P2d(a.getPos().x() - a_deltax, a.getPos().y() - a_deltay);
+            double b_factor = overlap * (a.mass / totalM);
+            double b_deltax = nx * a_factor;
+            double b_deltay = ny * a_factor;
+            b.pos = new P2d(b.getPos().x() + b_deltax, b.getPos().y() + b_deltay);
+            /* Update velocities */
+            /* relative speed along the normal vector*/
+            double dvx = b.vel.x() - a.vel.x();
+            double dvy = b.vel.y() - a.vel.y();
+            double dvn = dvx * nx + dvy * ny;
+            if (dvn <= 0) { /* if not already separating, update velocities */
+                double imp = -(1 + RESTITUTION_FACTOR) * dvn / (1.0 / a.getMass() + 1.0 / b.getMass());
+                a.vel = new V2d(a.vel.x() - (imp / a.mass) * nx, a.vel.y() - (imp / a.mass) * ny);
+                b.vel = new V2d(b.vel.x() + (imp / b.mass) * nx, b.vel.y() + (imp / b.mass) * ny);
             }
         }
     }
-
 
     public boolean checkInHole(List<Hole> holes){
         for (Hole h : holes) {
@@ -198,22 +172,15 @@ public class Ball {
     }
 
     private static void setCollider(Ball a, Ball b, String colliderType){
-        Ball first = (a.hashCode() < b.hashCode()) ? a : b;
-        Ball second = (first == b) ? a : b;
-
         // if b has a defined ball type, b is either the player or the bot => need to update a lastToCollide
         if (colliderType.equals("bot")){
             a.setLastToCollide("bot");
         } else if (colliderType.equals("player")) {
             a.setLastToCollide("player");
-        }
-        // if b does not have a defined ball type, need to transmit the other small ball's lastToCollide
-        else {
-            if (!first.getLastToCollide().equals("none")) {
-                second.setLastToCollide(first.getLastToCollide());
-            } else if (!second.getLastToCollide().equals("none")) {
-                first.setLastToCollide(second.getLastToCollide());
-            }
+        } else {
+            // if the colliderType is neither "bot" nor "player", we need to reset both a and b last collider
+            a.setLastToCollide("");
+            b.setLastToCollide("");
         }
     }
 

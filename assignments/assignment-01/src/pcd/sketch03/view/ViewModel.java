@@ -28,43 +28,31 @@ public class ViewModel {
         this.botScore = board.getCountMonitor().getBotScore();
         this.gameOver = board.isGameOver();
         this.endMessage = board.getEndMessage();
-        this.framePerSec = framePerSec;
-
-        if(holes.isEmpty()){
-            for (Hole h: board.getHoles()){
-                holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
-            }
+        holes.clear();
+        for (var h: board.getHoles()) {
+            holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
         }
-
-        List<Ball> boardBalls = board.getBalls();
-        while (balls.size() < boardBalls.size()) {
-            balls.add(new BallViewInfo(new P2d(0,0), 0));
-        }
-        for (int i = 0; i < boardBalls.size(); i++) {
-            Ball b = boardBalls.get(i);
-            BallViewInfo info = balls.get(i);
-            info.updateData(b.getPos(), b.getRadius());
-        }
-
+		balls.clear();
+		for (var b: board.getBalls()) {
+			balls.add(new BallViewInfo(b.getPos(), b.getRadius()));
+		}
+		this.framePerSec = framePerSec;
 		var p = board.getPlayerBall();
-        if (player == null){
-            player = new BallViewInfo(new P2d(0,0), 0);
-        }
-		player.updateData(p.getPos(), p.getRadius());
-
+		player = new BallViewInfo(p.getPos(), p.getRadius());
         var b = board.getBotBall();
-        if (bot == null) {
-            bot = new BallViewInfo(new P2d(0,0), 0);
-        }
-        bot.updateData(b.getPos(), b.getRadius());
+        bot = new BallViewInfo(b.getPos(), b.getRadius());
 	}
 	
 	public synchronized ArrayList<BallViewInfo> getBalls(){
-		return balls;
+		var copy = new ArrayList<BallViewInfo>();
+		copy.addAll(balls);
+		return copy;
 	}
 
     public synchronized ArrayList<BallViewInfo> getHoles(){
-        return holes;
+        var copy = new ArrayList<BallViewInfo>();
+        copy.addAll(holes);
+        return copy;
     }
 
 	public synchronized int getFramePerSec() {
