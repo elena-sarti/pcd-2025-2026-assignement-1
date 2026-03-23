@@ -14,7 +14,7 @@ public class Ball {
     private String lastToCollide = "";
 
     private static double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
-    private static double RESTITUTION_FACTOR = 1; // mi dice quanto è elastico l'urto.
+    private static double RESTITUTION_FACTOR = 1;
 
 
     public Ball(P2d pos, double radius, double mass, V2d vel){
@@ -33,7 +33,7 @@ public class Ball {
         double speed = vel.abs();
         double dt_scaled = dt*0.001;
         if (speed > 0.001) {
-            double dec    = FRICTION_FACTOR * dt_scaled; //decelerazione costante
+            double dec    = FRICTION_FACTOR * dt_scaled; //constant deceleration
             double factor = Math.max(0, speed - dec) / speed;
             vel = vel.mul(factor);
         } else {
@@ -46,7 +46,7 @@ public class Ball {
             this.vel = new V2d(0,0);
             return;
         }
-        applyBoundaryConstraints(ctx); //ho coordinate logiche, non pixel: siamo nel model
+        applyBoundaryConstraints(ctx);
     }
 
     public void kick(V2d vel) {
@@ -82,11 +82,10 @@ public class Ball {
      *
      * @param a
      * @param b
-     * @param ballIndex: the index of the small ball
      * @param ballType: the type of the big ball colliding with the small one: if it gets in a hole, we need to know which player
      *                sent it in.
      */
-    public static void resolveCollision(Ball a, Ball b, int ballIndex, String ballType) {
+    public static void resolveCollision(Ball a, Ball b, String ballType) {
         // define the order of the locks basing on the hashcode to prevent deadlock
         if (a.isInHole()) return;
         Ball first = (a.hashCode() < b.hashCode()) ? a : b;
@@ -103,11 +102,9 @@ public class Ball {
 
                 /* compute dv = b.pos - a.pos vector */
                 if (dist < minD && dist > 1e-6) {
-                    if (ballType.equals("bot")){
-                        a.setLastToCollide("bot");
-                    } else if (ballType.equals("player")) {
-                        a.setLastToCollide("player");
-                    }
+
+                    setCollider(a, b, ballType);
+
                     /*
                      * Collision case - what to do:
                      * 1) solve overlaps, moving balls
@@ -158,21 +155,22 @@ public class Ball {
 
     public boolean checkInHole(List<Hole> holes){
         for (Hole h : holes) {
-            double dx = pos.x() - h.getPos().x();
-            double dy = pos.y() - h.getPos().y();
-            double distSq = dx*dx + dy*dy; // Uso il quadrato della distanza per velocità
-
-            // La palla cade se la distanza tra i centri è minore della somma dei raggi
-            // Puoi aggiungere un piccolo "margine di risucchio" (es. * 1.2)
-            double minFoundDist = Math.pow(h.getRadius() + this.radius, 2);
-
-            if (distSq < minFoundDist) {
+            // the ball hits the hole if the distance is minor than the sum of the radii
+            if (distFromHole(h) < 0) {
                 this.setInHole(true);
-                this.vel = new V2d(0, 0); // Fermala subito
+                this.vel = new V2d(0, 0); // stopping the ball
                 return true;
             }
         }
         return false;
+    }
+
+    public double distFromHole(Hole h){
+        double dx = pos.x() - h.getPos().x();
+        double dy = pos.y() - h.getPos().y();
+        double distSq = dx*dx + dy*dy; // we use the squares for velocity
+        double minFoundDist = Math.pow(h.getRadius() + this.radius, 2);
+        return distSq - minFoundDist;
     }
 
     public P2d getPos(){
@@ -197,6 +195,26 @@ public class Ball {
 
     public boolean isInHole(){
         return inHole;
+    }
+
+    private static void setCollider(Ball a, Ball b, String colliderType){
+        Ball first = (a.hashCode() < b.hashCode()) ? a : b;
+        Ball second = (first == b) ? a : b;
+
+        // if b has a defined ball type, b is either the player or the bot => need to update a lastToCollide
+        if (colliderType.equals("bot")){
+            a.setLastToCollide("bot");
+        } else if (colliderType.equals("player")) {
+            a.setLastToCollide("player");
+        }
+        // if b does not have a defined ball type, need to transmit the other small ball's lastToCollide
+        else {
+            if (!first.getLastToCollide().equals("none")) {
+                second.setLastToCollide(first.getLastToCollide());
+            } else if (!second.getLastToCollide().equals("none")) {
+                first.setLastToCollide(second.getLastToCollide());
+            }
+        }
     }
 
     public void setLastToCollide(String last){

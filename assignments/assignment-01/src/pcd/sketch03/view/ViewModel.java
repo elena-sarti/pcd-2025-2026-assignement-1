@@ -3,8 +3,7 @@ package pcd.sketch03.view;
 import pcd.sketch03.model.*;
 
 import java.util.ArrayList;
-
-record BallViewInfo(P2d pos, double radius) {}
+import java.util.List;
 
 public class ViewModel {
 
@@ -13,43 +12,59 @@ public class ViewModel {
     private BallViewInfo bot;
     private ArrayList<BallViewInfo> holes;
 	private int framePerSec;
+    private int playerScore = 0;
+    private int botScore = 0;
     private volatile boolean gameOver = false;
     private String endMessage = "";
 	
 	public ViewModel() {
-		balls = new ArrayList<BallViewInfo>();
+		balls = new ArrayList<>();
         holes = new ArrayList<>();
 		framePerSec = 0;
 	}
 	
 	public synchronized void update(Board board, int framePerSec) {
+        this.playerScore = board.getCountMonitor().getPlayerScore();
+        this.botScore = board.getCountMonitor().getBotScore();
         this.gameOver = board.isGameOver();
         this.endMessage = board.getEndMessage();
-        holes.clear();
-        for (var h: board.getHoles()) {
-            holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
+        this.framePerSec = framePerSec;
+
+        if(holes.isEmpty()){
+            for (Hole h: board.getHoles()){
+                holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
+            }
         }
-		balls.clear();
-		for (var b: board.getBalls()) {
-			balls.add(new BallViewInfo(b.getPos(), b.getRadius()));
-		}
-		this.framePerSec = framePerSec;
+
+        List<Ball> boardBalls = board.getBalls();
+        while (balls.size() < boardBalls.size()) {
+            balls.add(new BallViewInfo(new P2d(0,0), 0));
+        }
+        for (int i = 0; i < boardBalls.size(); i++) {
+            Ball b = boardBalls.get(i);
+            BallViewInfo info = balls.get(i);
+            info.updateData(b.getPos(), b.getRadius());
+        }
+
 		var p = board.getPlayerBall();
-		player = new BallViewInfo(p.getPos(), p.getRadius());
+        if (player == null){
+            player = new BallViewInfo(new P2d(0,0), 0);
+        }
+		player.updateData(p.getPos(), p.getRadius());
+
         var b = board.getBotBall();
-        bot = new BallViewInfo(b.getPos(), b.getRadius());
+        if (bot == null) {
+            bot = new BallViewInfo(new P2d(0,0), 0);
+        }
+        bot.updateData(b.getPos(), b.getRadius());
 	}
 	
 	public synchronized ArrayList<BallViewInfo> getBalls(){
-		var copy = new ArrayList<BallViewInfo>();
-		copy.addAll(balls);
-		return copy;
+		return balls;
 	}
 
     public synchronized ArrayList<BallViewInfo> getHoles(){
-        var copy = new ArrayList<BallViewInfo>();
-        copy.addAll(holes);
-        return copy;
+        return holes;
     }
 
 	public synchronized int getFramePerSec() {
@@ -62,6 +77,14 @@ public class ViewModel {
 
     public synchronized BallViewInfo getBotBall(){
         return bot;
+    }
+
+    public synchronized int getPlayerScore(){
+        return playerScore;
+    }
+
+    public synchronized int getBotScore(){
+        return botScore;
     }
 
     public synchronized boolean isGameOver(){

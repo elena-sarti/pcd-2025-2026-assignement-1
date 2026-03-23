@@ -1,18 +1,11 @@
 package pcd.sketch03.model;
 
-import pcd.sketch03.model.Ball;
-import pcd.sketch03.model.BoardConf;
-import pcd.sketch03.model.Boundary;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Board {
-/*
-quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle palline
- */
-    private static final int nThreads = Runtime.getRuntime().availableProcessors() + 1;
+
+    private static final int nThreads = 20; //Runtime.getRuntime().availableProcessors() + 1;
     private List<Ball> balls;
     private Ball playerBall;
     private Ball botBall;
@@ -23,8 +16,6 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
     private String endMessage = "";
     CollisionMonitor collisionMonitor;
     CountMonitor counterMonitor;
-
-
     
     public Board(){} 
     
@@ -96,7 +87,7 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
             return;
         }
 
-        Ball.resolveCollision(botBall, playerBall, -1, "");
+        Ball.resolveCollision(botBall, playerBall, "");
 
     }
     
@@ -118,6 +109,10 @@ quando devo aggiornare la board, di dt: aggiorno lo stato delle palle, e delle p
 
     public List<Hole> getHoles(){
         return holes;
+    }
+
+    public CountMonitor getCountMonitor(){
+        return counterMonitor;
     }
 
     public boolean isGameOver(){

@@ -126,6 +126,10 @@ public class ViewFrame extends JFrame {
     		    g2.setStroke(new BasicStroke(1));
 	    		g2.drawString("Num small balls: " + model.getBalls().size(), 10, 740);
 	    		g2.drawString("Frame per sec: " + model.getFramePerSec(), 10, 760);
+                g2.setStroke(new BasicStroke(3));
+                g2.drawString("PLAYER SCORE: " + model.getPlayerScore(), 300, 760 );
+                g2.drawString("BOT SCORE: " + model.getBotScore(), 800, 760 );
+
 
                 if (model.isGameOver()) {
 
@@ -143,6 +147,7 @@ public class ViewFrame extends JFrame {
 
                     g2.drawString(endMessage, x, y);
                 }
+
 	    		sync.notifyFrameRendered();
     		
         }

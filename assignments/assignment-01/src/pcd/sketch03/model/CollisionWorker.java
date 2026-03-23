@@ -24,20 +24,20 @@ public class CollisionWorker extends Thread{
     }
 
     public void run(){
-        int indexToResolve;
+        int index;
 
-        while( (indexToResolve = collisionMonitor.getIndex()) >=0 ){
-           Ball b1 = balls.get(indexToResolve);
+        while( (index = collisionMonitor.getIndex()) >=0 ){
+           Ball b1 = balls.get(index);
             boolean fellInHole = false;
 
             if (b1.isInHole()){
                 continue; // Salta al prossimo indice del monitor
             }
 
-            for (int j = indexToResolve + 1; j < balls.size(); j++) { //to avoid updating twice the same couple, index i is confronted only with indexes j > i
+            for (int j = index + 1; j < balls.size(); j++) { //to avoid updating twice the same couple, index i is confronted only with indexes j > i
                 Ball b2 = balls.get(j);
                 if (b2.isInHole()) continue;
-                Ball.resolveCollision(b1, b2, -1, "");
+                Ball.resolveCollision(b1, b2, "");
 
                 if (b1.checkInHole(holes)) {
                     handleHole(b1);
@@ -50,13 +50,13 @@ public class CollisionWorker extends Thread{
                 continue;
             }
 
-            Ball.resolveCollision(b1, pb, indexToResolve, "player");
+            Ball.resolveCollision(b1, pb, "player");
             if (b1.checkInHole(holes)) {
                 handleHole(b1);
                 continue;
             }
 
-            Ball.resolveCollision(b1, bb, indexToResolve, "bot");
+            Ball.resolveCollision(b1, bb, "bot");
             if (b1.checkInHole(holes)) {
                 handleHole(b1);
             }

@@ -7,7 +7,7 @@ public class CountMonitor {
     private int countBot = 0;
 
     public synchronized void inc(String lastToCollide) {
-        if (Objects.equals(lastToCollide, "player")) {
+        if (lastToCollide.equals("player")) {
             countPlayer++;
         } else {
             countBot++;
