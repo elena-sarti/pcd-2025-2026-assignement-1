@@ -140,7 +140,7 @@ public class Board {
                 double dx = b.getPos().x() - h.getPos().x();
                 double dy = b.getPos().y() - h.getPos().y();
                 // a new velocity that keeps the bot far from the hole
-                V2d v = new V2d(dx, dy).getNormalized().mul(1.5);
+                V2d v = new V2d(dx, dy).getNormalized().mul(0.75);
                 b.kick(v);
                 return System.currentTimeMillis();
             }
