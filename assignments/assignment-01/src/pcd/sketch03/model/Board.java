@@ -16,8 +16,7 @@ public class Board {
     private Boundary bounds;
     private List<Hole> holes;
     List<CollisionWorker> workers;
-    long lastKickTimePB = System.currentTimeMillis();
-    long lastKickTimeBB = System.currentTimeMillis();
+    long lastKickTimeBB;
     private volatile boolean gameOver = false;
     private String endMessage = "";
     CollisionMonitor collisionMonitor;
@@ -32,6 +31,7 @@ public class Board {
         botBall = conf.getBotBall();
     	bounds = conf.getBoardBoundary();
         holes = conf.getHoles();
+        lastKickTimeBB = System.currentTimeMillis();
         spatialGrid = new ArrayList[GRID_ROWS][GRID_COLS];
         for (int r = 0; r < GRID_ROWS; r++) {
             for (int c = 0; c < GRID_COLS; c++) {
@@ -49,11 +49,7 @@ public class Board {
     }
 
     public void autonomousUpdateVel(){
-        /* if the player ball is stopped and 5 secs have elapsed, then kick the player ball */
-        if (shouldKick(playerBall, lastKickTimePB, 500)) {
-            lastKickTimePB = kickBall(playerBall);
-        }
-        /* if the bot ball is stopped and 5 secs have elapsed, then kick the bot ball */
+       /* if the bot ball is stopped and 5 secs have elapsed, then kick the bot ball */
         if (shouldKick(botBall, lastKickTimeBB, 200)) {
             lastKickTimeBB = kickBotBall(botBall);
         }

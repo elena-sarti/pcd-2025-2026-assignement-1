@@ -1,14 +1,18 @@
 package pcd.sketch03.view;
 
+import pcd.sketch03.controller.InputReader;
 import pcd.sketch03.model.*;
+import pcd.sketch03.util.BoundedBufferImpl;
 
 public class View {
 
 	private ViewFrame frame;
 	private ViewModel viewModel;
+    private BoundedBufferImpl<Integer> buffer;
 	
-	public View(ViewModel model, int w, int h) {
-		frame = new ViewFrame(model, w, h);	
+	public View(ViewModel model, int w, int h, BoundedBufferImpl<Integer> buffer) {
+        this.buffer = buffer;
+		frame = new ViewFrame(model, w, h, buffer);
 		frame.setVisible(true);
 		this.viewModel = model;
 	}

@@ -1,7 +1,10 @@
 package pcd.sketch03.view;
 
+import pcd.sketch03.util.BoundedBufferImpl;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -10,10 +13,12 @@ public class ViewFrame extends JFrame {
     private VisualiserPanel panel;
     private ViewModel model;
     private RenderSynch sync;
+    private BoundedBufferImpl<Integer> inputBuffer;
     
-    public ViewFrame(ViewModel model, int w, int h){
+    public ViewFrame(ViewModel model, int w, int h, BoundedBufferImpl<Integer> buffer){
     	this.model = model;
     	this.sync = new RenderSynch();
+        this.inputBuffer = buffer;
     	setTitle("Sketch 03");
         setSize(w,h + 25);
         setResizable(false);
@@ -27,6 +32,15 @@ public class ViewFrame extends JFrame {
 				System.exit(-1);
 			}
 		});
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {try {
+                    inputBuffer.put(e.getKeyCode());
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
      
     public void render(){
