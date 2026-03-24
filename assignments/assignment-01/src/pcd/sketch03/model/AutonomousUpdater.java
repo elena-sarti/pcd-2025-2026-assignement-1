@@ -32,14 +32,6 @@ public class AutonomousUpdater extends Thread {
             }
             viewModel.update(board, framePerSec);
             view.render();
-            waitAbit();
-        }
-    }
-
-    private static void waitAbit() {
-        try {
-            Thread.sleep(20);
-        } catch (Exception ex) {
         }
     }
 }

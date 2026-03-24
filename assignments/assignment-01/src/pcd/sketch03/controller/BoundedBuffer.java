@@ -1,4 +1,4 @@
-package pcd.sketch03.util;
+package pcd.sketch03.controller;
 
 public interface BoundedBuffer<Item> {
 

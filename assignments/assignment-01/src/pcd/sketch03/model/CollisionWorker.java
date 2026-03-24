@@ -35,10 +35,12 @@ public class CollisionWorker extends Thread {
     }
 
     private void resolveCollisionInMySlice() {
-        int rows = board.getGridRows();
-        int rowsPerThread = rows / nThreads;
-        int startRow = id * rowsPerThread;
-        int endRow = (id == nThreads - 1) ? rows : startRow + rowsPerThread;
+        int totalRows = board.getGridRows();
+        int rowsPerThread = totalRows / nThreads;
+        int remainder = totalRows % nThreads;
+        int startRow = id * rowsPerThread + Math.min(id, remainder);
+        int endRow = startRow + rowsPerThread + (id < remainder ? 1 : 0);
+//        System.out.println("Worker " + id + " processa righe: " + startRow + " - " + endRow);
         for (int r = startRow; r < endRow; r++) {
             for (int c = 0; c < board.getGridCols(); c++) {
                 List<Ball> currentCell = board.getGridCell(r, c);

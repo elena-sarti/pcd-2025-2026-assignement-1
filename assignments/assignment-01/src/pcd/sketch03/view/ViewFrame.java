@@ -1,6 +1,6 @@
 package pcd.sketch03.view;
 
-import pcd.sketch03.util.BoundedBufferImpl;
+import pcd.sketch03.controller.BoundedBufferImpl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;

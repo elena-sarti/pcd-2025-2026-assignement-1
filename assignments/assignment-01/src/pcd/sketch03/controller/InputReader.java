@@ -3,8 +3,6 @@ package pcd.sketch03.controller;
 import pcd.sketch03.model.Board;
 import pcd.sketch03.model.Ball;
 import pcd.sketch03.model.V2d;
-import pcd.sketch03.util.BoundedBuffer;
-import pcd.sketch03.util.BoundedBufferImpl;
 
 import static java.awt.event.KeyEvent.*;
 

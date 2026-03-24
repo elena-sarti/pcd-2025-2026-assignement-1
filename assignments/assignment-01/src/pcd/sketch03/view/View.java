@@ -1,8 +1,6 @@
 package pcd.sketch03.view;
 
-import pcd.sketch03.controller.InputReader;
-import pcd.sketch03.model.*;
-import pcd.sketch03.util.BoundedBufferImpl;
+import pcd.sketch03.controller.BoundedBufferImpl;
 
 public class View {
 

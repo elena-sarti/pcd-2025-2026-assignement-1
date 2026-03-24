@@ -101,17 +101,18 @@ public class Board {
     private void rebuildGrid() {
         for (int r = 0; r < GRID_ROWS; r++) {
             for (int c = 0; c < GRID_COLS; c++) {
-                synchronized (spatialGrid) {
+                synchronized (spatialGrid[r][c]) {
                     spatialGrid[r][c].clear();
                 }
             }
         }
-        double cellWidth = bounds.getWidth() / GRID_COLS;
-        double cellHeight = bounds.getHeight() / GRID_ROWS;
+        double rangeY = bounds.y1() - bounds.y0();
+        double rangeX = bounds.x1() - bounds.x0();
         for (Ball b : balls) {
             if (b.isInHole()) continue;
-            int col = (int) (b.getPos().x() / cellWidth);
-            int row = (int) (b.getPos().y() / cellHeight);
+            int row = (int) (((bounds.y1() - b.getPos().y()) / rangeY) * GRID_ROWS);
+            int col = (int) (((b.getPos().x() - bounds.x0()) / rangeX) * GRID_COLS);
+            // CLAMP: Impedisce di andare a -1 o fuori range per arrotondamenti
             row = Math.max(0, Math.min(row, GRID_ROWS - 1));
             col = Math.max(0, Math.min(col, GRID_COLS - 1));
             synchronized(spatialGrid[row][col]) {
