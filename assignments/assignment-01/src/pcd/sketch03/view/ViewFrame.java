@@ -19,7 +19,7 @@ public class ViewFrame extends JFrame {
     	this.model = model;
     	this.sync = new RenderSynch();
         this.inputBuffer = buffer;
-    	setTitle("Sketch 03");
+    	setTitle("Poool Game");
         setSize(w,h + 25);
         setResizable(false);
         panel = new VisualiserPanel(w,h);

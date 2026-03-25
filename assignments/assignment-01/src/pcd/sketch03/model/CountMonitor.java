@@ -9,7 +9,7 @@ public class CountMonitor {
     public synchronized void inc(String lastToCollide) {
         if (lastToCollide.equals("player")) {
             countPlayer++;
-        } else {
+        } else if (lastToCollide.equals("bot")) {
             countBot++;
         }
     }

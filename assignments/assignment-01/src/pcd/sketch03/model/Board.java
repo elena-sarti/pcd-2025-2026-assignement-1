@@ -129,7 +129,7 @@ public class Board {
         var rand = new Random();
         var angle = rand.nextDouble() * Math.PI * 0.25;
         var v = new V2d(Math.cos(angle), Math.sin(angle)).mul(1.5);
-        b.kick(v); //assegno quella velocità alla pallina ferma
+        b.kick(v);
         return System.currentTimeMillis();
     }
 
