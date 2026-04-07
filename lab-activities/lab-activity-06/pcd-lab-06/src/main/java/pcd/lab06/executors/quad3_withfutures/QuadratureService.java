@@ -6,7 +6,7 @@ import java.util.concurrent.*;
 
 public class QuadratureService extends Thread {
 
-	private int numTasks;
+	private int numTasks;// il numero dei tasks non dipende dai threads, ma dal problema
 	private ExecutorService executor;
 	
 	public QuadratureService (int numTasks, int poolSize){		
@@ -18,7 +18,7 @@ public class QuadratureService extends Thread {
 
 		double x0 = a;
 		double step = (b-a)/numTasks;		
-	    List<Future<Double>> results = new LinkedList<Future<Double>>();
+	    List<Future<Double>> results = new LinkedList<Future<Double>>(); //future in un contesto SINCRONO, non si parla di eventi
 		for (int i = 0; i < numTasks; i++) {
 			try {
 				Future<Double> res = executor.submit(new ComputeAreaTask(x0, x0 + step, mf));

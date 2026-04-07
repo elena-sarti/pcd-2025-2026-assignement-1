@@ -23,7 +23,7 @@ public class FolderSearchTask extends RecursiveTask<Long> {
         for (Folder subFolder : folder.getSubFolders()) {
             FolderSearchTask task = new FolderSearchTask(wc, subFolder, searchedWord);
             forks.add(task);
-            task.fork();
+            task.fork(); //per generare i sottotask. Non so a priori quanti tasks verranno creati
         }
         
         for (Document document : folder.getDocuments()) {

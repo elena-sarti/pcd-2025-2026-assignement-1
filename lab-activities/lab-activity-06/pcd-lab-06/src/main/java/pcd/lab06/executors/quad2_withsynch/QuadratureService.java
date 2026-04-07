@@ -25,7 +25,8 @@ public class QuadratureService  {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}				
+		}
+        //se ho un monitor, non devo chiudere l'executor=> non lo devo chiudere
 		double res = result.getResult();
 		return res;
 	}

@@ -1,5 +1,6 @@
 package pcd.lab07.vertx;
 
+import java.io.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.*;
 import io.vertx.core.Vertx;
@@ -12,7 +13,7 @@ import io.vertx.core.file.FileSystem;
  * 
  */
 class MyReactiveAgent extends VerticleBase {
-	
+	//posso fare overriding di start e di stop. Nella classe identifico tutto il codice che verrà eseguito nell'event loop
 	  private int cycle;
 	
 	  // Called when verticle is deployed
@@ -21,7 +22,7 @@ class MyReactiveAgent extends VerticleBase {
 	
 		log("1 (cycle: " + cycle + ") - doing the async call...");
 		
-		FileSystem fs = this.vertx.fileSystem();    				
+		FileSystem fs = this.vertx.fileSystem(); // il campo vertx è l'event loop
 		Future<Buffer> f1 = fs.readFile("hello.md");
 		f1.onComplete((AsyncResult<Buffer> res) -> {
 			cycle++;			
@@ -54,11 +55,11 @@ class MyReactiveAgent extends VerticleBase {
 public class Step2_withverticle {
 
 	public static void main(String[] args) {
-		Vertx  vertx = Vertx.vertx();
+		Vertx vertx = Vertx.vertx();
 		vertx
-		.deployVerticle(new MyReactiveAgent())
+		.deployVerticle(new MyReactiveAgent()) //do a deploy verticle il mio agente asincrono. Anche deployVerticle restituisce una future, ciòè la start()
 		.onSuccess(res -> {
-			log("Reactive agent deployed.");
+			log("Reactive agent deployed."); //eseguita quando è eseguita la start()
 		});
 	}
 

@@ -2,6 +2,7 @@ package pcd.lab06.executors.forkjoin;
 
 import java.util.concurrent.RecursiveTask;
 
+//se uso un fork join,non ho dei callable, ho dei recursive tasks
 public class DocumentSearchTask extends RecursiveTask<Long> {
     
 	private final Document document;

@@ -2,7 +2,7 @@ package pcd.lab06.executors.quad3_withfutures;
 
 import java.util.concurrent.Callable;
 
-
+// implementa callable, co il tipo del risultato. Ha un metodo call => FUTURE.
 public class ComputeAreaTask implements Callable<Double>  {
 
 	private IFunction mf;

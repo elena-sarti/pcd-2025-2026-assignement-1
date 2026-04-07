@@ -41,7 +41,7 @@ public class MatMulConcurLib {
 					*/
 				}
 			}
-			exec.shutdown();
+			exec.shutdown(); //informo l'executor che non verranno messi dentro altri tasks.
 			exec.awaitTermination(Long.MAX_VALUE,TimeUnit.SECONDS);
 			return matC;
 		} catch (Exception ex){

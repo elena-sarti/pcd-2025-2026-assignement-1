@@ -28,7 +28,7 @@ public class QuadratureService {
 			}
 		}				
 
-		executor.shutdown();
+		executor.shutdown(); //dato che non ho la garanzia che tutti hanno finito, dato che non ho le future e non chiamo get, devo chiudere l'executor
 		executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);		
 		double res = result.getResult();
 		return res;

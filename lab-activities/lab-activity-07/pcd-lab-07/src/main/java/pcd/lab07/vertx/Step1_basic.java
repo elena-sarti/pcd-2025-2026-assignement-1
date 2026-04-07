@@ -1,11 +1,11 @@
-	package pcd.lab07.vertx;
+package pcd.lab07.vertx;
 
+import java.io.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
-import java.io.*;
 
 public class Step1_basic {
 
@@ -13,15 +13,15 @@ public class Step1_basic {
 		
 		System.out.println(new File(".").getAbsoluteFile());
 		
-		Vertx  vertx = Vertx.vertx();
+		Vertx vertx = Vertx.vertx();
 
 		FileSystem fs = vertx.fileSystem();    		
 
 		log("doing the async call... ");
 		
-		Future<Buffer> fut = fs.readFile("hello.md");
+		Future<Buffer> fut = fs.readFile("hello.md"); // PROMISE! NON FUTURE ASINCRONE, NON POSSO USARE LA GET
 		
-		fut.onComplete((AsyncResult<Buffer> res) -> {	
+		fut.onComplete((AsyncResult<Buffer> res) -> {	//onComplete è come then su js
 			log("hello.md content: \n" + res.result().toString());
 		});
 

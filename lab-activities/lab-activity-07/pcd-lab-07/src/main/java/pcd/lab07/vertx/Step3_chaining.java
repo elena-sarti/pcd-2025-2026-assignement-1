@@ -16,11 +16,13 @@ class TestChain extends VerticleBase {
 	public Future<?> start() throws Exception {
 		FileSystem fs = vertx.fileSystem();    		
 
-		fs.readFile("hello.md")
-		.compose((Buffer buf) -> {
+		fs.readFile("hello.md") //restituisce Future<Buffer> => mi aspetto di avere un Buffer come risultato
+		.compose((Buffer buf) -> { //compose(): metodo delle promise per concatenare i risultati.
+            // 3 chiamate asincrone, ma sequenzialmente. faccio una chiamata solo se ho ricevuto il risultato di quella prima,
+            // però non sono bloccanti
 			log("1 - hello.md: \n" + buf.toString());
 			return fs.readFile("pom.xml");
-		}).compose((Buffer buf) -> {
+		}).compose((Buffer buf) -> { //per non avere nesting, con il chaining, ritorno ogni volta una promise.
 			log("2 - POM: \n" + buf.toString().substring(0,160));
 			return fs.readDir("src");
 		}).onComplete((AsyncResult<List<String>> list) -> {
