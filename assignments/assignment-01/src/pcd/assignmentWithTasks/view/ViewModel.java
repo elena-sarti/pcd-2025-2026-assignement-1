@@ -1,5 +1,6 @@
 package pcd.assignmentWithTasks.view;
 
+import pcd.assignmentWithTasks.controller.GameStateManager;
 import pcd.assignmentWithTasks.model.Board;
 
 import java.util.ArrayList;
@@ -22,11 +23,11 @@ public class ViewModel {
 		framePerSec = 0;
 	}
 	
-	public synchronized void update(Board board, int framePerSec) {
-        this.playerScore = board.getCountMonitor().getPlayerScore();
-        this.botScore = board.getCountMonitor().getBotScore();
-        this.gameOver = board.isGameOver();
-        this.endMessage = board.getEndMessage();
+	public synchronized void update(Board board, GameStateManager gameStateManager, int framePerSec) {
+        this.playerScore = gameStateManager.getMonitor().getPlayerScore();
+        this.botScore = gameStateManager.getMonitor().getBotScore();
+        this.gameOver = gameStateManager.isGameOver();
+        this.endMessage = gameStateManager.getEndMessage();
         holes.clear();
         for (var h: board.getHoles()) {
             holes.add(new BallViewInfo(h.getPos(), h.getRadius()));

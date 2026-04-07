@@ -1,4 +1,4 @@
-package pcd.assignmentWithTasks.model;
+package pcd.assignmentWithTasks.controller;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -24,7 +24,6 @@ public class CountDownLatch {
                 allDone.await();
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         } finally {
             lock.unlock();
         }
@@ -36,7 +35,6 @@ public class CountDownLatch {
             nProcsDone++;
             if (nProcsDone == nProcs){
                 allDone.signal();
-                nProcsDone = 0;
             }
         } finally {
             lock.unlock();

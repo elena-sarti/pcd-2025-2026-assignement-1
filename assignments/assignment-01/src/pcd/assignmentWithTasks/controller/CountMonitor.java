@@ -1,4 +1,4 @@
-package pcd.assignmentWithTasks.model;
+package pcd.assignmentWithTasks.controller;
 
 public class CountMonitor {
     private int countPlayer = 0;

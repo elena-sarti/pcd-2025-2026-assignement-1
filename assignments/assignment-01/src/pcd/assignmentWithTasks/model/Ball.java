@@ -46,7 +46,7 @@ public class Ball {
         applyBoundaryConstraints(ctx);
     }
 
-    public void kick(V2d vel) {
+    public synchronized void kick(V2d vel) {
         this.vel = vel;
     }
 
@@ -146,7 +146,7 @@ public class Ball {
         return distSq - minFoundDist;
     }
 
-    public P2d getPos(){
+    public synchronized P2d getPos(){
         return pos;
     }
 
@@ -154,7 +154,7 @@ public class Ball {
         return mass;
     }
 
-    public V2d getVel() {
+    public synchronized V2d getVel() {
         return vel;
     }
 
@@ -183,7 +183,7 @@ public class Ball {
         }
     }
 
-    public void setLastToCollide(String last){
+    public synchronized void setLastToCollide(String last){
         lastToCollide = last;
     }
 
