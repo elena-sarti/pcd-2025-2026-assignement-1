@@ -17,7 +17,7 @@ public class CountDownLatch {
         allDone = lock.newCondition();
     }
 
-    public void await(){
+    public void await() throws InterruptedException{
         try{
             lock.lock();
             while(nProcsDone < nProcs){
@@ -36,6 +36,7 @@ public class CountDownLatch {
             nProcsDone++;
             if (nProcsDone == nProcs){
                 allDone.signal();
+                nProcsDone = 0;
             }
         } finally {
             lock.unlock();

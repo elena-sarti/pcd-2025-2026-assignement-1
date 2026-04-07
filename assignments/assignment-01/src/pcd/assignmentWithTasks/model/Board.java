@@ -23,8 +23,8 @@ public class Board {
     private ArrayList[][] spatialGrid;
     private ExecutorService exec;
     int nTasks = Runtime.getRuntime().availableProcessors() * 4;
-    private CountDownLatch latch = new CountDownLatch(nTasks);
-    
+    CountDownLatch latch;
+
     public Board(){} 
     
     public void init(BoardConf conf) {
@@ -42,6 +42,7 @@ public class Board {
         }
         counterMonitor = new CountMonitor();
         exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+        latch =  new CountDownLatch(nTasks);
     }
 
     public void updateVel(){
@@ -53,7 +54,6 @@ public class Board {
 
     public void updateState(long dt){
         if (this.gameOver) {
-            exec.shutdown();
             return;
         }
         moveAllBalls(dt);
@@ -61,7 +61,11 @@ public class Board {
         for(int id = 0; id < nTasks; id++){
             exec.execute(new ResolveCollisionsTask(this, counterMonitor, id, nTasks, latch));
         }
-        latch.await();
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         synchronized(balls){
             balls.removeIf(b -> {
                 if (b.isInHole()) {
@@ -73,6 +77,7 @@ public class Board {
         }
         if (balls.isEmpty()){
             gameOver = true;
+            exec.shutdown();
             endMessage = counterMonitor.getPlayerScore() > counterMonitor.getBotScore() ? "GAME OVER - YOU WON!" : "GAME OVER - you lost :(" ;
             return;
         }
@@ -83,12 +88,14 @@ public class Board {
         playerBall.updateState(elapsedTime, this);
         if (playerBall.isInHole()) {
             gameOver = true;
+            exec.shutdown();
             endMessage = "GAME OVER - you lost :(";
             return;
         }
         botBall.updateState(elapsedTime, this);
         if (botBall.isInHole()) {
             gameOver = true;
+            exec.shutdown();
             endMessage = "GAME OVER - YOU WON!";
             return;
         }
