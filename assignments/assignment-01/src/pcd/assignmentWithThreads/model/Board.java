@@ -7,8 +7,8 @@ import java.util.Random;
 
 public class Board {
 
-    private final int GRID_ROWS = 20;
-    private final int GRID_COLS = 20;
+    private final int GRID_ROWS = 100;
+    private final int GRID_COLS = 60;
     private static final int nThreads = Runtime.getRuntime().availableProcessors() + 1;
     private List<Ball> balls;
     private Ball playerBall;

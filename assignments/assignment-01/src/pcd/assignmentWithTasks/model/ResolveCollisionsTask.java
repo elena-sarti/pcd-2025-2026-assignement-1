@@ -8,17 +8,17 @@ public class ResolveCollisionsTask implements Runnable {
     private final CountMonitor counterMonitor;
     private final Board board;
     private final int id;
-    private final int nThreads;
+    private final int nTasks;
     private Ball pb;
     private Ball bb;
     private List<Hole> holes;
     private CountDownLatch latch;
 
-    public ResolveCollisionsTask(Board board, CountMonitor counterMonitor, int id, int nThreads, CountDownLatch latch) {
+    public ResolveCollisionsTask(Board board, CountMonitor counterMonitor, int id, int nTasks, CountDownLatch latch) {
         this.board = board;
         this.counterMonitor = counterMonitor;
         this.id = id;
-        this.nThreads = nThreads;
+        this.nTasks = nTasks;
         this.pb = board.getPlayerBall();
         this.bb = board.getBotBall();
         this.holes = board.getHoles();
@@ -32,8 +32,8 @@ public class ResolveCollisionsTask implements Runnable {
 
     private void resolveCollisionInMySlice() {
         int totalRows = board.getGridRows();
-        int rowsPerThread = totalRows / nThreads;
-        int remainder = totalRows % nThreads;
+        int rowsPerThread = totalRows / nTasks;
+        int remainder = totalRows % nTasks;
         int startRow = id * rowsPerThread + Math.min(id, remainder);
         int endRow = startRow + rowsPerThread + (id < remainder ? 1 : 0);
         for (int r = startRow; r < endRow; r++) {

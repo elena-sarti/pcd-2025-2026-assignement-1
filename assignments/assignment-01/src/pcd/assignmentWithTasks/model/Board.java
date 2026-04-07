@@ -9,9 +9,8 @@ import java.util.concurrent.Executors;
 
 public class Board {
 
-    private final int GRID_ROWS = 20;
-    private final int GRID_COLS = 20;
-    private final int nThreads = Runtime.getRuntime().availableProcessors() + 1;
+    private final int GRID_ROWS = 50;
+    private final int GRID_COLS = 50;
     private List<Ball> balls;
     private Ball playerBall;
     private Ball botBall;
@@ -23,6 +22,8 @@ public class Board {
     CountMonitor counterMonitor;
     private ArrayList[][] spatialGrid;
     private ExecutorService exec;
+    int nTasks = Runtime.getRuntime().availableProcessors() * 4;
+    private CountDownLatch latch = new CountDownLatch(nTasks);
     
     public Board(){} 
     
@@ -40,7 +41,7 @@ public class Board {
             }
         }
         counterMonitor = new CountMonitor();
-        exec = Executors.newFixedThreadPool(nThreads);
+        exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
     }
 
     public void updateVel(){
@@ -50,15 +51,15 @@ public class Board {
         }
     }
 
-    public void updateState(long dt) {
+    public void updateState(long dt){
         if (this.gameOver) {
+            exec.shutdown();
             return;
         }
         moveAllBalls(dt);
         rebuildGrid();
-        CountDownLatch latch = new CountDownLatch(nThreads);
-        for(int id = 0; id < nThreads; id++){
-            exec.execute(new ResolveCollisionsTask(this, counterMonitor, id, nThreads, latch));
+        for(int id = 0; id < nTasks; id++){
+            exec.execute(new ResolveCollisionsTask(this, counterMonitor, id, nTasks, latch));
         }
         latch.await();
         synchronized(balls){
