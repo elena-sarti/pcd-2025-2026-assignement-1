@@ -1,4 +1,4 @@
-package pcd.assignmentWithThreads.model;
+package pcd.assignmentWithThreads.controller;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

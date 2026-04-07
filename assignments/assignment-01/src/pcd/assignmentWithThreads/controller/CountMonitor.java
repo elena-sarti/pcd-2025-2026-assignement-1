@@ -1,4 +1,4 @@
-package pcd.assignmentWithThreads.model;
+package pcd.assignmentWithThreads.controller;
 
 public class CountMonitor {
     private int countPlayer = 0;

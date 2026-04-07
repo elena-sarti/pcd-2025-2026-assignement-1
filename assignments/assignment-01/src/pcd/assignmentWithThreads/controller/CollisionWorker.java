@@ -1,4 +1,8 @@
-package pcd.assignmentWithThreads.model;
+package pcd.assignmentWithThreads.controller;
+
+import pcd.assignmentWithThreads.model.Ball;
+import pcd.assignmentWithThreads.model.Board;
+import pcd.assignmentWithThreads.model.Hole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +38,14 @@ public class CollisionWorker extends Thread {
     }
 
     private void resolveCollisionInMySlice() {
-        int totalRows = board.getGridRows();
+        int totalRows = board.getGrid().getRows();
         int rowsPerThread = totalRows / nThreads;
         int remainder = totalRows % nThreads;
         int startRow = id * rowsPerThread + Math.min(id, remainder);
         int endRow = startRow + rowsPerThread + (id < remainder ? 1 : 0);
         for (int r = startRow; r < endRow; r++) {
-            for (int c = 0; c < board.getGridCols(); c++) {
-                List<Ball> currentCell = board.getGridCell(r, c);
+            for (int c = 0; c < board.getGrid().getCols(); c++) {
+                List<Ball> currentCell = board.getGrid().getGridCell(r, c);
                 List<Ball> cellSnapshot;
                 //need to have a copy of the currentCell to do operations on, otherwise other threads could access it at the same time => race conditions
                 synchronized(currentCell){
@@ -70,7 +74,7 @@ public class CollisionWorker extends Thread {
         // the check is made with the current cell and the 8 that are beside it.
         for (int dr = -1; dr <= 1; dr++) {
             for (int dc = -1; dc <= 1; dc++) {
-                List<Ball> cell = board.getGridCell(r + dr, c + dc);
+                List<Ball> cell = board.getGrid().getGridCell(r + dr, c + dc);
                 List<Ball> snapshot;
                 synchronized(cell){
                     snapshot = new ArrayList<>(cell);
@@ -83,7 +87,6 @@ public class CollisionWorker extends Thread {
                     Ball second = (first == b1) ? b2 : b1;
                     synchronized(first){
                         synchronized(second) {
-                            // Chiamata alla tua funzione originale (intatta!)
                             Ball.resolveCollision(b1, b2, "");
                         }
                     }

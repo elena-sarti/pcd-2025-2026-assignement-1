@@ -3,6 +3,7 @@ package pcd.assignmentWithTasks.model;
 import java.util.List;
 
 public class Board {
+
     private List<Ball> balls;
     private Ball playerBall;
     private Ball botBall;
