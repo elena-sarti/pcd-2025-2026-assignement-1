@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class PhysicsEngine {
     private final ExecutorService exec;
-    private final int nTasks = Runtime.getRuntime().availableProcessors() * 3;
+    private final int nTasks = Runtime.getRuntime().availableProcessors() * 5;
 
     public PhysicsEngine() {
         this.exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);

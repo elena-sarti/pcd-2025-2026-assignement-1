@@ -21,7 +21,7 @@ public class Test04a_swing_pubsub {
 			setVisible(true);
 			JButton button = new JButton("Press me");
 			button.addActionListener((ActionEvent ev) -> {
-				stream.onNext(1);
+				stream.onNext(1); // metto nel listener della gui onNext: ogni volta che premo il pulsante, aggiungo un elemento
 			});
 			getContentPane().add(button);
 			addWindowListener(new WindowAdapter(){
@@ -47,7 +47,7 @@ public class Test04a_swing_pubsub {
 			});
 
 		clickStream
-			.buffer(clickStream.throttleWithTimeout(250, TimeUnit.MILLISECONDS))
+			.buffer(clickStream.throttleWithTimeout(250, TimeUnit.MILLISECONDS))//throttleWithTimeout è il debounce
 			.map(xs -> xs.size())
 			.filter((v) -> v >= 2)
 			.subscribe((v) -> {

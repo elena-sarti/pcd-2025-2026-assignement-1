@@ -15,7 +15,7 @@ class TestExecBlocking extends VerticleBase {
 	public Future<?> start() throws Exception {
 		log("before");
 
-		Future<Integer> res = this.vertx.executeBlocking(() -> {
+		Future<Integer> res = this.vertx.executeBlocking(() -> { // anche se è eseguito da un background thread, è un operazione bloccante
 			// Call some blocking API that takes a significant amount of time to return
 			log("blocking computation started");
 			try {

@@ -48,7 +48,7 @@ public class Step7_EventBus {
 		Vertx  vertx = Vertx.vertx();
 		vertx
 		.deployVerticle(new MyAgent1())
-		.onSuccess(res -> {
+		.onSuccess(res -> { //Solo quando il primo agente è pronto e registrato sull'Event Bus, viene distribuito MyAgent2
 			/* deploy the second verticle only when the first has completed */
 			vertx.deployVerticle(new MyAgent2());
 		});

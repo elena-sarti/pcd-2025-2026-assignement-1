@@ -1,0 +1,5 @@
+target = pcd.jpf.CollisionMonitorTest
+
+classpath = /pcd-jpf
+
+listener = gov.nasa.jpf.listener.PreciseRaceDetector

@@ -16,7 +16,7 @@ class VerticleWithPromise extends VerticleBase {
 		fut.onComplete((res) -> {
 			System.out.println("Result: " + res.result());	
 		});
-		return  super.start();
+		return super.start();
 	}
 
 	/**
@@ -29,13 +29,13 @@ class VerticleWithPromise extends VerticleBase {
 	 * @param delay
 	 * @return
 	 */
-	protected Future<Double> getDelayedRandom(int delay){
-		Promise<Double> promise = Promise.promise();
-		this.vertx.setTimer(delay, (res) -> {
+	protected Future<Double> getDelayedRandom(int delay){ //metodo asincrono
+		Promise<Double> promise = Promise.promise(); // quando creo una promise, il tipo è promise
+		this.vertx.setTimer(delay, (res) -> { // specifico la callback da chiamare quando è risolto il timer
 			var num = Math.random();
-			promise.complete(num);
+			promise.complete(num); // dico che la promise è completata con .complete()
 		});
-		return promise.future();
+		return promise.future(); //posso ottenere la future corrispondente alla promise - il lato che vede il client, subito dato al client. per agganciarci .onComplete
 	}
 	
 	private void log(String msg) {

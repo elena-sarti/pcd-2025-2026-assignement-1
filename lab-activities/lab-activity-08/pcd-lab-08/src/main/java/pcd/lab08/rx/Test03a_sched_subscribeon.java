@@ -36,8 +36,8 @@ public class Test03a_sched_subscribeon {
 			.map(v -> { log("map 2 " + v); return v + 1; });		
 
 		src
-			.subscribeOn(Schedulers.computation()) /* run the observable on a worker */	
-			.subscribe(v -> {									
+			.subscribeOn(Schedulers.computation()) /* run the observable on a worker */	//crea tanti thread quanti n core +1, perchè è un operazione computataional
+			.subscribe(v -> {			//cosi uso un pool di threads per la sottoscrizione, uso subscribeOn
 				log("sub 1 " + v);
 			});
 
@@ -58,7 +58,7 @@ public class Test03a_sched_subscribeon {
 		 */
 
 		Flowable.range(1, 10)
-		  .flatMap(v ->
+		  .flatMap(v -> //creo un nuovo flusso, con il quadrato degli elementi. per ogni elemento ho un flusso separato con il quadrato
 		      Flowable.just(v)
 		      	.subscribeOn(Schedulers.computation()) /* each flowable has its own thread */
 				.map(w -> { 
@@ -66,7 +66,7 @@ public class Test03a_sched_subscribeon {
 					return w * w; 
 				})		
 		  )
-		  .blockingSubscribe(v -> {
+		  .blockingSubscribe(v -> { //voglio 1! thread che fa l'osservazione - il main, lo stesso thread che chiama il metodo blockingSubscribe
 			 log("sub > " + v); 
 		  });
 		

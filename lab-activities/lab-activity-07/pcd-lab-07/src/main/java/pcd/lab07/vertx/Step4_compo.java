@@ -17,9 +17,9 @@ class TestCompo extends VerticleBase{
 		Future<Buffer> f2 = fs.readFile("POM.xml");
 				
 		Future
-		.all(f1,f2)
+		.all(f1,f2) // .all() è il factory method per creare una future come composizione di altre future- .any() per prendere la prima che è risolta
 		.onSuccess((CompositeFuture res) -> {
-			log("COMPOSITE => \n"+res.result().list());			
+			log("COMPOSITE => \n"+res.result().list());	//result() prendo i risultati
 		}); 
 		return super.start();
 	}

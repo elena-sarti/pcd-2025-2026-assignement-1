@@ -10,8 +10,8 @@ public class Test02e_creation_hot_pubsub {
 
 		/* Subjects: bridges functioning both as observer and observable */ 
 
-		PublishSubject<Integer> source = PublishSubject.<Integer>create();
-		 
+		PublishSubject<Integer> source = PublishSubject.<Integer>create(); //PUBLISHSUBJECT è un canale per produrre elementi e consumare elementi fuori
+		 //creo un flusso vuoto, poi lo riempio. posso chiamare onNext fuori dalla lambda di generazione
 		log("subscribing.");
 
 		source.subscribe((s) -> {

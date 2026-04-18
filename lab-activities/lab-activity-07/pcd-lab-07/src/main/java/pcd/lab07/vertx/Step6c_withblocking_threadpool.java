@@ -72,6 +72,6 @@ public class Step6c_withblocking_threadpool {
 		Vertx vertx = Vertx.vertx();
 		
 		int workerPoolSize = Runtime.getRuntime().availableProcessors();
-		vertx.deployVerticle(new TestExecBlocking3(), new DeploymentOptions().setWorkerPoolSize(workerPoolSize));
+		vertx.deployVerticle(new TestExecBlocking3(), new DeploymentOptions().setWorkerPoolSize(workerPoolSize)); //se voglio avere che le azioni bloccanti siano tutte svolte da threads diversi
 	}
 }

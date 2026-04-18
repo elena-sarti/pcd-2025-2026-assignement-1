@@ -52,6 +52,7 @@ public class Sketch01 {
 			/* update board state */
 			
 			long elapsed = System.currentTimeMillis() - lastUpdateTime;
+            System.out.println("Tempo per l'esecuzione di un'iterazione del game loop:" + elapsed);
 			lastUpdateTime = System.currentTimeMillis();			
 			board.updateState(elapsed);
 			

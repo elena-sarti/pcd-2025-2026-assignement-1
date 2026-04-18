@@ -24,7 +24,7 @@ class MyReactiveAgent extends VerticleBase {
 		
 		FileSystem fs = this.vertx.fileSystem(); // il campo vertx è l'event loop
 		Future<Buffer> f1 = fs.readFile("hello.md");
-		f1.onComplete((AsyncResult<Buffer> res) -> {
+		f1.onComplete((AsyncResult<Buffer> res) -> { // posso usare .onSuccess per dire cosa fare se la promise è risolta con successo
 			cycle++;			
 			log("4 (cycle: " + cycle + ") - hello.md \n" + res.result().toString());
 		});

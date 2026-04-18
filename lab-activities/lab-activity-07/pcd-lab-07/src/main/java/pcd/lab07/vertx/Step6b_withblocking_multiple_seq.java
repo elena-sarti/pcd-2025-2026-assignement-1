@@ -33,7 +33,7 @@ class TestExecBlocking2 extends VerticleBase {
 			}
 		});
 
-		Future<Integer> f2 = this.vertx.executeBlocking(() -> {
+		Future<Integer> f2 = this.vertx.executeBlocking(() -> { //entrambe svolte dallo stesso background thread
 			// Call some blocking API that takes a significant amount of time to return
 			log("blocking computation #2 started");
 			try {

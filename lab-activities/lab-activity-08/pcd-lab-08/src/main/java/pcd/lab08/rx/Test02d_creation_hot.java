@@ -8,7 +8,7 @@ public class Test02d_creation_hot {
 
 	public static void main(String[] args) throws Exception {
 
-		System.out.println("\n=== TEST Hot streams  ===\n");
+		System.out.println("\n=== TEST Hot streams  ===\n"); //flussi HOT, non lazy
 		
 		Observable<Integer> source = Observable.create(emitter -> {		     
 			new Thread(() -> {
@@ -25,7 +25,7 @@ public class Test02d_creation_hot {
 		     //emitter.setCancellable(c::close);
 		 });
 		
-		ConnectableObservable<Integer> hotObservable = source.publish();
+		ConnectableObservable<Integer> hotObservable = source.publish(); //per renderlo hot devo chiamare publish e connect
 		hotObservable.connect();
 	
 		/* give time for producing some data before any subscription */
@@ -33,7 +33,7 @@ public class Test02d_creation_hot {
 		
 		log("Subscribing A.");
 		
-		hotObservable.subscribe((s) -> {
+		hotObservable.subscribe((s) -> { //quando faccio subscribe, se il thread genera un nuovo elemento nello stream allora lo dice agli osservatori => perdo un po di elementi
 			log("subscriber A: "+s);
 			// Thread.sleep(5000);
 		});	

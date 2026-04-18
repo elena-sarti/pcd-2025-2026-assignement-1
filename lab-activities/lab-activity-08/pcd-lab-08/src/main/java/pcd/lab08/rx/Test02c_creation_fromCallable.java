@@ -8,7 +8,7 @@ public class Test02c_creation_fromCallable {
 
 		System.out.println("\n=== TEST fromCallable | main thread ===\n");
 
-		Flowable.fromCallable(() -> {
+		Flowable.fromCallable(() -> { //fromCallable per creare un flusso con un solo elemento
 		    log("started.");
 		    Thread.sleep(1000); 
 		    log("completed.");

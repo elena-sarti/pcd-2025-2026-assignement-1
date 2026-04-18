@@ -9,7 +9,7 @@ public class Test02b_creation_async {
 		log("Creating an observable (cold) using its own thread.");
 
 		Observable<Integer> source = Observable.create(emitter -> {		     
-			new Thread(() -> {
+			new Thread(() -> { //creo un thread che genera 20 elementi e li mette nel flusso
 				int i = 0;
 				while (i < 20){
 					try {
@@ -27,7 +27,7 @@ public class Test02b_creation_async {
 		
 		log("Subscribing A.");
 		
-		source.subscribe((s) -> {
+		source.subscribe((s) -> { //ogni volta che sottoscrivo, la lambda genera un threads nuovo
 			log("Subscriber A: " + s); 
 		});	
 
@@ -35,7 +35,7 @@ public class Test02b_creation_async {
 
 		log("Subscribing B.");
 
-		source.subscribe((s) -> {
+		source.subscribe((s) -> { //2 subscribe => 2 thread, con lo stesso comportamento
 			log("Subscriber B: " + s); 
 		});	
 

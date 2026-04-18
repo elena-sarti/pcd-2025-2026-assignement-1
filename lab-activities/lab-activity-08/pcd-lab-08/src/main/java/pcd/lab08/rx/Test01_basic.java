@@ -1,7 +1,6 @@
 package pcd.lab08.rx;
 
 import java.util.Arrays;
-
 import io.reactivex.rxjava3.core.*;
 
 public class Test01_basic {
@@ -11,14 +10,13 @@ public class Test01_basic {
 		log("creating with just.");
 		
 	    Observable
-	    .just("Hello world")
-	    .subscribe(s -> {	    		
-	    		log(s);    		
+	    .just("Hello world") //.just è un factory: crea un observable, con 1! elemento
+	    .subscribe(s -> {	 //COMPORTAMENTO COLD: inizio a vedere gli elementi solo quando faccio subscribe. subscribe SINCRONA - fa pull, prende gli elementi nell'observable e poi fa log
+	    		log(s);    	//gli el. vengono generati solo quando c'è un osservatore, con subscribe. comportamento SINCRONO
 	    });
 	    
 	    // with inline method
-	    
-	    Flowable.just("Hello world")
+	    Flowable.just("Hello world") //flowable da strutture per gestire molti dati
 	    	.subscribe(System.out::println);
 	    
 		// creating a flow (an observable stream) from a static collection
@@ -32,16 +30,16 @@ public class Test01_basic {
 				log(s);
 			});
 		
-		// full subscription: onNext(), onError(), onCompleted()
+		// full subscription: onNext(), onError(), onCompleted() - per specificare come chiudere lo stream
 		
 		log("Full subscription...");
 		
 		Observable.fromArray(words)
-			.subscribe((String s) -> {
+			.subscribe((String s) -> { //onNext
 				log("> " + s);
-			},(Throwable t) -> {
+			},(Throwable t) -> { //onError
 				log("error  " + t);
-			},() -> {
+			},() -> { //onCompleted
 				log("completed");
 			});
 		
@@ -49,14 +47,14 @@ public class Test01_basic {
 
 		log("simple application of operators");
 		
-		Flowable<Integer> flow = 
+		Flowable<Integer> flow = //stream dei quadrati degli elementi multipli di tre tra 1 e 20
 		Flowable
 			.range(1, 20)
 			.map(v -> v * v)
 			.filter(v -> v % 3 == 0);
 		
 		log("first subscription #1");
-		flow.subscribe(System.out::println);
+		flow.subscribe(System.out::println); //genero gli elementi dello stream quando faccio subscribe
 
 		log("first subscription #2");
 		flow.subscribe((v) -> {
