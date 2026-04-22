@@ -12,6 +12,7 @@ import java.util.List;
 public class FSStatExtension {
 
     FileSystem fs;
+    private Boolean stopped = false;
 
     public FSStatExtension(Vertx vertx) {
         this.fs = vertx.fileSystem();
@@ -36,37 +37,58 @@ public class FSStatExtension {
         return fs
                 .readDir(path)
                 .recover(err -> {
-                    System.err.println("Access error - directory: " + path + " - Cause: " + err.getMessage());
-                    return Future.succeededFuture(Collections.<String>emptyList());
+                    if (!stopped) {
+                        System.err.println("Access error - directory: " + path + " - Cause: " + err.getMessage());
+                        return Future.succeededFuture(Collections.<String>emptyList());
+                    } else {
+                        return Future.failedFuture("Operation stopped by user");
+                    }
                 })
                 .compose(list -> {
-                    System.out.println("Directory " + path + " contains " + list.size() + " elements.");
-                    List<Future<Report>> futures = new ArrayList<>();
-                    for (String file : list) {
-                        System.out.println("Checking: " + file);
-                        futures.add(fs
-                                .props(file)
-                                .compose(props -> {
-                                    if (props.isDirectory()) {
-                                        return scanAndPopulate(file, maxFS, nB);
-                                    } else if (props.isRegularFile()) {
-                                        return Future.succeededFuture(createFileReport(props.size(), maxFS, nB));
+                    if (!stopped) {
+                        System.out.println("Directory " + path + " contains " + list.size() + " elements.");
+                        List<Future<Report>> futures = new ArrayList<>();
+                        for (String file : list) {
+                            System.out.println("Checking: " + file);
+                            futures.add(fs
+                                    .props(file)
+                                    .compose(props -> {
+                                        if (!stopped) {
+                                            if (props.isDirectory()) {
+                                                return scanAndPopulate(file, maxFS, nB);
+                                            } else if (props.isRegularFile()) {
+                                                return Future.succeededFuture(createFileReport(props.size(), maxFS, nB));
+                                            }
+                                            return Future.succeededFuture();
+                                        } else {
+                                            return Future.failedFuture("Operation stopped by user");
+                                        }
+                                    })
+                                    .recover(err -> {
+                                            if (!stopped) {
+                                                return Future.succeededFuture(new Report(0, new int[nB + 1]));
+                                            } else {
+                                                return Future.failedFuture("Operation stopped by user");
+                                            }
+                                    })
+                            );
+                        }
+                        return Future
+                                .all(futures)
+                                .compose(composite -> {
+                                    if(!stopped) {
+                                        Report total = new Report(0, new int[nB + 1]);
+                                        for (int i = 0; i < composite.size(); i++) {
+                                            total = mergeReports(total, composite.resultAt(i));
+                                        }
+                                        return Future.succeededFuture(total);
+                                    } else {
+                                        return Future.failedFuture("Operation stopped by user");
                                     }
-                                    return Future.succeededFuture();
-                                })
-                                .recover(err ->
-                                        Future.succeededFuture(new Report(0, new int[nB + 1])))
-                        );
+                                });
+                    } else {
+                        return Future.failedFuture("Operation stopped by user");
                     }
-                    return Future
-                            .all(futures)
-                            .map(composite -> {
-                                Report total = new Report(0, new int[nB + 1]);
-                                for (int i = 0; i < composite.size(); i++) {
-                                    total = mergeReports(total, composite.resultAt(i));
-                                }
-                                return total;
-                            });
                 });
     }
 
@@ -109,4 +131,11 @@ public class FSStatExtension {
         return new Report(totalFiles, mergedDist);
     }
 
+    public Boolean getStopped() {
+        return stopped;
+    }
+
+    public void setStopped(Boolean stopped) {
+        this.stopped = stopped;
+    }
 }

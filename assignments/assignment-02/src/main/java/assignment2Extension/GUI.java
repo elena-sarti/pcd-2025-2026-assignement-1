@@ -9,6 +9,9 @@ public class GUI {
     private static Boolean stopped;
 
     public static void main(String[] args) {
+        Vertx vertx = Vertx.vertx();
+        FSStatExtension lib = new FSStatExtension(vertx);
+
         JFrame frame = new JFrame("GUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 500);
@@ -55,24 +58,22 @@ public class GUI {
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         startButton.addActionListener(startPressed -> {
-            stopped = false;
+            lib.setStopped(false);
             String d = dir.getText();
             results.append("Generating report for directory "+d+" :\n");
             int maxSize = Integer.parseInt(maxFS.getText());
             int numBands = Integer.parseInt(nB.getText());
-            Vertx vertx = Vertx.vertx();
-            FSStatExtension lib = new FSStatExtension(vertx);
             lib
             .getFSReport(d, maxSize, numBands)
             .onSuccess(report -> {
-                if(!stopped) {
+                if(!lib.getStopped()) {
                     results.append(report.toString()+"\n");
                 }
             });
         });
 
         stopButton.addActionListener(stopPressed -> {
-            stopped = true;
+            lib.setStopped(true);
             results.append("Stopped report generation for directory "+ dir.getText() +".\n");
         });
 
