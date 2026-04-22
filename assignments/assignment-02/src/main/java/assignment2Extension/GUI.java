@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GUI {
-    private static Boolean stopped;
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
