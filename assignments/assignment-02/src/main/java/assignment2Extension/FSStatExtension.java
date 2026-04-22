@@ -10,7 +10,8 @@ import java.util.List;
 
 public class FSStatExtension {
 
-    FileSystem fs;
+    private volatile String lastFileFound;
+    private FileSystem fs;
     private Boolean stopped = false;
 
     public FSStatExtension(Vertx vertx) {
@@ -56,6 +57,7 @@ public class FSStatExtension {
                                             if (props.isDirectory()) {
                                                 return scanAndPopulate(file, maxFS, nB);
                                             } else if (props.isRegularFile()) {
+                                                setLastFileFound(file, props.size());
                                                 return Future.succeededFuture(createFileReport(props.size(), maxFS, nB));
                                             }
                                             return Future.succeededFuture();
@@ -136,5 +138,13 @@ public class FSStatExtension {
 
     public void setStopped(Boolean stopped) {
         this.stopped = stopped;
+    }
+
+    public String getLastFileFound() {
+        return lastFileFound;
+    }
+
+    public void setLastFileFound(String file, long size){
+        lastFileFound = "Found file " + file + " of size (in KB): " + String.valueOf((int) size / 1024);
     }
 }

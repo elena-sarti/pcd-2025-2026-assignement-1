@@ -1,5 +1,6 @@
 package assignment2Extension;
 
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
 import javax.swing.*;
@@ -62,9 +63,22 @@ public class GUI {
             results.append("Generating report for directory "+d+" :\n");
             int maxSize = Integer.parseInt(maxFS.getText());
             int numBands = Integer.parseInt(nB.getText());
+            long timer = vertx
+                        .setPeriodic(100, t -> {
+                            String lastFile = lib.getLastFileFound();
+                            if (lastFile != null && !lib.getStopped()) {
+                                SwingUtilities.invokeLater(() -> {
+                                    results.append(lastFile + "\n");
+                                });
+                            }
+                            if (lib.getStopped()) {
+                                vertx.cancelTimer(t);
+                            }
+                        });
             lib
             .getFSReport(d, maxSize, numBands)
             .onSuccess(report -> {
+                vertx.cancelTimer(timer);
                 if(!lib.getStopped()) {
                     results.append(report.toString()+"\n");
                 }
