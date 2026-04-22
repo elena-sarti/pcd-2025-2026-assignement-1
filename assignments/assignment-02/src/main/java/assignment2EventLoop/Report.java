@@ -1,4 +1,4 @@
-package assignment2;
+package assignment2EventLoop;
 
 import java.util.Arrays;
 
