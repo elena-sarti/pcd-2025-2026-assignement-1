@@ -62,7 +62,7 @@ public class TestFFStatExtension {
             int maxSize = Integer.parseInt(maxFS.getText());
             int numBands = Integer.parseInt(nB.getText());
             long timer = vertx
-                        .setPeriodic(100, t -> {
+                        .setPeriodic(50, t -> {
                             String lastFile = lib.getLastFileFound();
                             if (lastFile != null && !lib.getStopped()) {
                                 SwingUtilities.invokeLater(() -> {
