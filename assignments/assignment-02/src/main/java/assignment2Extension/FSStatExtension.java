@@ -19,26 +19,12 @@ public class FSStatExtension {
     }
 
     public Future<Report> getFSReport(String d, int maxFS, int nB) {
-        return scanAndPopulate(d, maxFS, nB);
-    }
-
-    /**
-     * Asynchronously performs a recursive traversal of the directory structure.
-     * It generates a Future for each child element and aggregates the results
-     * using composition once all operations are complete.
-     *
-     * @param path  The current directory path being processed.
-     * @param maxFS The size threshold in KB for categorization.
-     * @param nB    The number of distribution bands.
-     * @return      A Future containing the aggregated Report for the current sub-tree.
-     */
-    private Future<Report> scanAndPopulate(String path, int maxFS, int nB) {
-        System.out.println("Reading directory: " + path);
+        System.out.println("Reading directory: " + d);
         return fs
-                .readDir(path)
+                .readDir(d)
                 .recover(err -> {
                     if (!stopped) {
-                        System.err.println("Access error - directory: " + path + " - Cause: " + err.getMessage());
+                        System.err.println("Access error - directory: " + d + " - Cause: " + err.getMessage());
                         return Future.succeededFuture(Collections.<String>emptyList());
                     } else {
                         return Future.failedFuture("Operation stopped by user");
@@ -46,7 +32,7 @@ public class FSStatExtension {
                 })
                 .compose(list -> {
                     if (!stopped) {
-                        System.out.println("Directory " + path + " contains " + list.size() + " elements.");
+                        System.out.println("Directory " + d + " contains " + list.size() + " elements.");
                         List<Future<Report>> futures = new ArrayList<>();
                         for (String file : list) {
                             System.out.println("Checking: " + file);
@@ -55,7 +41,7 @@ public class FSStatExtension {
                                     .compose(props -> {
                                         if (!stopped) {
                                             if (props.isDirectory()) {
-                                                return scanAndPopulate(file, maxFS, nB);
+                                                return getFSReport(file, maxFS, nB);
                                             } else if (props.isRegularFile()) {
                                                 setLastFileFound(file, props.size());
                                                 return Future.succeededFuture(createFileReport(props.size(), maxFS, nB));
@@ -66,11 +52,11 @@ public class FSStatExtension {
                                         }
                                     })
                                     .recover(err -> {
-                                            if (!stopped) {
-                                                return Future.succeededFuture(new Report(0, new int[nB + 1]));
-                                            } else {
-                                                return Future.failedFuture("Operation stopped by user");
-                                            }
+                                        if (!stopped) {
+                                            return Future.succeededFuture(new Report(0, new int[nB + 1]));
+                                        } else {
+                                            return Future.failedFuture("Operation stopped by user");
+                                        }
                                     })
                             );
                         }

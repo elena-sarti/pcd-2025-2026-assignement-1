@@ -1,17 +1,15 @@
 package assignment2Extension;
 
-import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class GUI {
+public class TestFFStatExtension {
+    static Vertx vertx = Vertx.vertx();
+    static FSStatExtension lib = new FSStatExtension(vertx);
 
     public static void main(String[] args) {
-        Vertx vertx = Vertx.vertx();
-        FSStatExtension lib = new FSStatExtension(vertx);
-
         JFrame frame = new JFrame("GUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 500);
@@ -86,8 +84,10 @@ public class GUI {
         });
 
         stopButton.addActionListener(stopPressed -> {
-            lib.setStopped(true);
-            results.append("Stopped report generation for directory "+ dir.getText() +".\n");
+            if (!lib.getStopped()) {
+                lib.setStopped(true);
+                results.append("Stopped report generation for directory "+ dir.getText() +".\n");
+            }
         });
 
         mainPanel.add(label1);
