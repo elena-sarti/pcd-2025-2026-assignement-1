@@ -79,6 +79,7 @@ public class TestFFStatExtension {
                 vertx.cancelTimer(timer);
                 if(!lib.getStopped()) {
                     results.append(report.toString()+"\n");
+                    lib.setStopped(true);
                 }
             });
         });
