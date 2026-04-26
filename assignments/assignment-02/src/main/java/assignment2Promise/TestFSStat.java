@@ -2,7 +2,7 @@ package assignment2Promise;
 
 import io.vertx.core.Vertx;
 
-public class Test_FSStat {
+public class TestFSStat {
     public static void main(String[] args){
         Vertx vertx = Vertx.vertx();
         FSStat library = new FSStat(vertx);
