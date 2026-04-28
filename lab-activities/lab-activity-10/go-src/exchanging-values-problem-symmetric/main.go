@@ -19,7 +19,7 @@ func Peer(id int, channels []chan int)  {
   for i := 0; i < len(channels); i++ {
     if i != id {
       fmt.Printf("[Peer %d] sending to channel %d \n", id, i)
-      channels[i] <- v
+      channels[i] <- v //la send è bloccante: ognuno può fare la receive solo dopo che il valore è stato ricevuto. => devo creare un buffer di dimensione n_peers. channels[i] ha n_peers elementi
     }    
   }
 
@@ -46,7 +46,7 @@ func main() {
 	n_peers := 10
 	channels := make([]chan int, n_peers)
   for i := 0 ; i < n_peers; i++ {
-    channels[i] = make(chan int, n_peers)
+    channels[i] = make(chan int, n_peers) //devo creare i singoli canali dopo avere inizializzato l'array di canali. Specifico la dimensione dell'array come secondo elemento
   }
 
 	for i := 0; i < n_peers; i++ {

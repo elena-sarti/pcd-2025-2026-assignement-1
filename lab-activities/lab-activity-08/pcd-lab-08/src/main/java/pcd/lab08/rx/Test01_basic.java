@@ -24,7 +24,7 @@ public class Test01_basic {
 	    // simple subscription 
 	    
 		String[] words = { "Hello", " ", "World", "!" }; 
-		
+
 		Flowable.fromArray(words)
 			.subscribe((String s) -> {
 				log(s);

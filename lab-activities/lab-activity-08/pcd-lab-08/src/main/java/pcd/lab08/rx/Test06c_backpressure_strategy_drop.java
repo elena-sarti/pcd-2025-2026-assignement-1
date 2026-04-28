@@ -17,7 +17,7 @@ public class Test06c_backpressure_strategy_drop {
 
 		/* never generating a MissingBackpressureException => elements are dropped */
 		
-		source
+		source //posso usare come strategia quella di eliminare gli elementi
 		.onBackpressureDrop(v  -> {
 			log("DROPPING: " + v);
 		})
@@ -50,7 +50,7 @@ public class Test06c_backpressure_strategy_drop {
 					log("exit");
 				}
 			}).start();
-		}, BackpressureStrategy.LATEST);
+		}, BackpressureStrategy.LATEST); //dico quale eliminare degli elementi
 
 		ConnectableFlowable<Long> hotObservable = source.publish();
 		hotObservable.connect();

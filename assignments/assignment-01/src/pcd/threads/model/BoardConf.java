@@ -1,0 +1,16 @@
+package pcd.threads.model;
+
+import java.util.List;
+
+public interface BoardConf {
+
+	Boundary getBoardBoundary();
+
+    List<Hole> getHoles();
+	
+	Ball getPlayerBall();
+
+    Ball getBotBall();
+	
+	List<Ball> getSmallBalls();
+}

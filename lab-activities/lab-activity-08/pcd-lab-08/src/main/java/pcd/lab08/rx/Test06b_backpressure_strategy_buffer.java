@@ -19,9 +19,9 @@ public class Test06b_backpressure_strategy_buffer {
 		/* with buffer size = 5_000, it generates a MissingBackpressureException 
 		 * after ~8000 emits (it depends on the local config) */
 		
-		source
+		source //uso un buffer; posso specififcare cosa fare se si crea una situazione di errore. Riesce a collezione gli elementi in un buffer
 			.onBackpressureBuffer(5_000, () -> {
-				log("HELP!");
+				log("HELP!"); //
 			})
 			.observeOn(Schedulers.computation())
 			.subscribe(v -> {

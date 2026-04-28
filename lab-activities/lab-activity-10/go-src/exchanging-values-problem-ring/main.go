@@ -45,7 +45,7 @@ func Coord(left_ch chan MinMaxMsg, right_ch chan MinMaxMsg)  {
   m :=  <- right_ch
   left_ch <- m
   fmt.Printf("[Coord] Max is %d and min is %d \n", m.max, m.min)
-  <- right_ch
+  <- right_ch // devo fare l'ultima receive, altrimenti si blocca l'ultimo elemento dell'anello quando fa la sua send che non avrebbe receive
 }
 
 

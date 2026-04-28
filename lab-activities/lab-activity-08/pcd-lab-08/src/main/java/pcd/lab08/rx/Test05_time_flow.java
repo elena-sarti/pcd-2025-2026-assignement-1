@@ -13,11 +13,11 @@ public class Test05_time_flow {
 		log("Generating.");
 		
 		Observable
-		.interval(100, TimeUnit.MILLISECONDS)	// Long
+		.interval(100, TimeUnit.MILLISECONDS)	// Long - GENERA UNA SEQUENZA D INTERI, DOVE OGNI ELEMENTO VIENE GENERATO DOPO UN INTERVALLO CHE SPECIFICO IO
         .doOnNext(v -> logDeb("1> " + v))
         .timestamp() 							// Timed
         .doOnNext(v -> logDeb("2> " + v))
-        .sample(500, TimeUnit.MILLISECONDS)
+        .sample(500, TimeUnit.MILLISECONDS)// fa un campionamento ogni 500 ms
         .doOnNext(v -> logDeb("3> " + v))
 		.map(ts -> " " + (ts.time(TimeUnit.MILLISECONDS) - startTime) + " ms - value: " + ts.value())
         .doOnNext(v -> logDeb("4> " + v))

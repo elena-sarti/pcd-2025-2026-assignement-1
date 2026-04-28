@@ -1,6 +1,6 @@
 package pcd.jpf;
 
-import pcd.assignmentWithThreads.controller.CollisionMonitor;
+import pcd.threads.controller.CollisionMonitor;
 
 public class CollisionMonitorTest {
     public static void main(String[] args) {

@@ -7,17 +7,20 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class Test06a_backpressure_problem {
 
 	public static void main(String[] args) throws Exception {
+        //nel produttori consumatori, se i due hanno velocità diversa, a un certo punto il bounded buffer blocca il produttore.
+        //Ma qui non lo posso fermare => problema di BACK PRESSURE: se la velocità è troppo alta, a un certo punto do un errore. Ho pi
+        //strategie per affrontare il problema: con un buffer, scartando elemento con un throttle
 
 		System.out.println("\n=== TEST backpressure ===\n");
 
 		/* generator with period 5 ms */
-		Flowable<Long> source = genHotStream(5);
+		Flowable<Long> source = genHotStream(5); //specifica uno stream - ogni 5 ms genera un elemento
 
 		log("subscribing.");
 
 		/* generating a MissingBackpressureException after ~7000 emits (it depends on the local config) */
 
-		source
+		source //creo un subscriber che consuma gli elementi con una velocità molto bassa
 		.observeOn(Schedulers.computation())
 		.subscribe(v -> {
 			log("consuming " + v);
