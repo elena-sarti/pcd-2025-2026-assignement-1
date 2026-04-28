@@ -1,4 +1,4 @@
-package assignment2Extension;
+package extension;
 
 import io.vertx.core.Vertx;
 
@@ -10,6 +10,10 @@ public class TestFFStatExtension {
     static FSStatExtension lib = new FSStatExtension(vertx);
 
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(TestFFStatExtension::gui);
+    }
+
+    public static void gui(){
         JFrame frame = new JFrame("GUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 500);

@@ -1,4 +1,4 @@
-package assignment2Extension;
+package extension;
 
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;

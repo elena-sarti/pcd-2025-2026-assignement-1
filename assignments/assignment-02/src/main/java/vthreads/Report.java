@@ -1,4 +1,4 @@
-package assignment2VirtualThreads;
+package vthreads;
 
 import java.util.Arrays;
 

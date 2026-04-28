@@ -1,4 +1,4 @@
-package assignment2Extension;
+package extension;
 
 import java.util.Arrays;
 

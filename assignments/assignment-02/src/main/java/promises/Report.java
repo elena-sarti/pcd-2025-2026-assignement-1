@@ -1,4 +1,4 @@
-package assignment2Promise;
+package promises;
 
 import java.util.Arrays;
 

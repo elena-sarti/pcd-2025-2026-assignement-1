@@ -1,4 +1,4 @@
-package assignment2Reactive;
+package reactive;
 
 import java.util.Arrays;
 

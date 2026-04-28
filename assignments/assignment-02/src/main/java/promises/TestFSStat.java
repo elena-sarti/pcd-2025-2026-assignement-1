@@ -1,4 +1,4 @@
-package assignment2Promise;
+package promises;
 
 import io.vertx.core.Vertx;
 
