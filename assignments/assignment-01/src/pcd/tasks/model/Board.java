@@ -19,7 +19,7 @@ public class Board {
         this.botBall = conf.getBotBall();
         this.bounds = conf.getBoardBoundary();
         this.holes = conf.getHoles();
-        this.grid = new SpatialGrid(20, 20, bounds);
+        this.grid = new SpatialGrid(40, 40, bounds);
     }
 
     public List<Ball> getBalls() {
