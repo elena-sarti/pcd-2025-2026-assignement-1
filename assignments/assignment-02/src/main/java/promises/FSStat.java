@@ -22,7 +22,7 @@ public class FSStat {
                 .readDir(d)
                 .recover(err -> {
                     System.err.println("Access error - directory: " + d + " - Cause: " + err.getMessage());
-                    return Future.succeededFuture(Collections.<String>emptyList()); // Restituisci lista vuota
+                    return Future.succeededFuture(Collections.<String>emptyList());
                 })
                 .compose(list -> {
                     System.out.println("Directory " + d + " contains " + list.size() + " elements.");

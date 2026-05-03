@@ -8,31 +8,26 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import io.reactivex.rxjava3.core.*;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public class FSStat {
 
-    public Report getFSReport(String d, int maxFS, int nB) throws IOException {
-        PublishSubject<File> source = PublishSubject.<File>create();
-        source
-            .subscribeOn(Schedulers.io())
-            .subscribe();
-        Observable<Report> reportObservable = source
+    public Observable<Report> getFSReport(String d, int maxFS, int nB){
+        //creating a cold observable with .create()
+        return Observable.<File>create(emitter -> {
+                    try {
+                        addFiles(emitter, d);
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                    }
+                })
                 .map(file -> createFileReport(file.length(), maxFS, nB))
-                .scan(this::mergeReports);
-        new Thread(() -> {
-            try {
-                addFiles(source, d);
-                source.onComplete();
-            } catch (IOException e) {
-                source.onError(e);
-            }
-        }).start();
-        return reportObservable.blockingLast(); //blockingLast() does an implicit subscribe on reportObservable
+                .scan(this::mergeReports)
+                .lastElement()
+                .toObservable();
     }
 
-    private void addFiles(PublishSubject<File> source, String path) throws IOException {
+    private void addFiles(ObservableEmitter<File> source, String path) throws IOException {
         System.out.println("Checking directory " + path);
         Stream<Path> paths = Files.list(Paths.get(path));
         paths.forEach(p ->{
