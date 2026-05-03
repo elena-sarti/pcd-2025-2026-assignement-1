@@ -81,10 +81,16 @@ public class TestFFStatExtension {
             .getFSReport(d, maxSize, numBands)
             .onSuccess(report -> {
                 vertx.cancelTimer(timer);
-                if(!lib.getStopped()) {
-                    results.append(report.toString()+"\n");
-                    lib.setStopped(true);
-                }
+                SwingUtilities.invokeLater(() -> {
+                    if (!lib.getStopped()) {
+                        results.append(report.toString() + "\n");
+                        lib.setStopped(true);
+                    }
+                });
+            })
+            .onFailure(err -> {
+                vertx.cancelTimer(timer);
+                SwingUtilities.invokeLater(() -> results.append("Error: " + err.getMessage() + "\n"));
             });
         });
 
