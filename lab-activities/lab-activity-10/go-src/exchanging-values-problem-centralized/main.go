@@ -50,11 +50,8 @@ func main() {
 
 	n_peers := 10
 
-	coord_ch := make (chan int) //  make alloca nello heap l'entità che voglio, come la malloc. Allora quando passo coord_ch passo il riferimento al canale
+	coord_ch := make (chan int)
 	channels := make([]chan MinMaxMsg, n_peers)
-	for i := 0; i < n_peers; i++ {
-    		channels[i] = make(chan MinMaxMsg)
-    }
 
 	go Coord(n_peers, coord_ch, channels)
 
@@ -62,6 +59,5 @@ func main() {
 		go Peer(i, coord_ch, channels[i])
 	}
 
-	for {
-	}
+	for {}
 }
