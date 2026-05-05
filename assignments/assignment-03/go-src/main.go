@@ -48,17 +48,18 @@ func Round(n_rounds int, players []chan int, winner_ch chan int){
     for i := 0; i < n_players; i += 2 {
         match_winner_ch := make(chan int)
         go Match(players[i], players[i + 1], match_winner_ch)
-        round_winners[i / 2] = make(chan int, 1) //Un invio su un canale non bufferizzato (senza la dimensione specificata) si blocca finché non c'è qualcuno pronto a ricevere in quel preciso istante
+        round_winners[i / 2] = make(chan int, 1)
         round_winners[i / 2] <- (<- match_winner_ch)
     }
     if n_rounds == 1 {
         winner_ch <- (<- round_winners[0])
     } else {
         fmt.Printf("New round started! \n")
-        Round(n_rounds - 1, round_winners, winner_ch)
+        go Round(n_rounds - 1, round_winners, winner_ch)
     }
 }
 
+//Tutti i canali sono bufferizzati (di dimensione specificata) perchè un invio su un canale non bufferizzato si blocca se non c'è qualcuno pronto a ricevere in quel preciso istante
 func main() {
     fmt.Println("Tournament started!")
     n_rounds := 5
@@ -69,7 +70,7 @@ func main() {
         players[i] <- i
     }
     winner_ch := make(chan int, 1)
-    Round(n_rounds, players, winner_ch)
+    go Round(n_rounds, players, winner_ch)
     winner := <- winner_ch
     fmt.Printf("Game winner: player %d!\n", winner)
 }
