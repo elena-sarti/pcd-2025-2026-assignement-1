@@ -20,10 +20,9 @@ func Player(msg_ch chan HeadsOrTails){
     msg_ch <- HeadsOrTails{msg: msg}
 }
 
-func Match(match_ch chan int, players []chan int, winner_ch chan int){
-    match_number := <- match_ch
-    player_1 := <- players[match_number]
-    player_2 := <- players[match_number + 1]
+func Match(player_1_ch chan int, player_2_ch chan int, winner_ch chan int){
+    player_1 := <- player_1_ch
+    player_2 := <- player_2_ch
     msg_ch := make (chan HeadsOrTails)
     go Player(msg_ch)
     var winning_msg string
@@ -47,10 +46,8 @@ func Round(n_rounds int, players []chan int, winner_ch chan int){
     round_winners := make([]chan int, int(math.Pow(2, float64(n_rounds-1))))
     n_players := int(math.Pow(2, float64(n_rounds)))
     for i := 0; i < n_players; i += 2 {
-        match_number_ch := make(chan int)
         match_winner_ch := make(chan int)
-        go Match(match_number_ch, players, match_winner_ch)
-        match_number_ch <- i
+        go Match(players[i], players[i + 1], match_winner_ch)
         round_winners[i / 2] = make(chan int, 1) //Un invio su un canale non bufferizzato (senza la dimensione specificata) si blocca finché non c'è qualcuno pronto a ricevere in quel preciso istante
         round_winners[i / 2] <- (<- match_winner_ch)
     }
