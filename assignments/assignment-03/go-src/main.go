@@ -66,18 +66,13 @@ func Round(n_rounds int, players []chan int){
 
 func main() {
     fmt.Println("Tournament started!")
-
     n_rounds := 5
     n_players := int(math.Pow(2, float64(n_rounds)))
-
     players := make([]chan int, n_players)
-
     for i := 0 ; i < n_players; i++ {
         players[i] = make(chan int, 1)
         players[i] <- i
     }
-
     go Round(n_rounds, players)
-
     for {}
 }
