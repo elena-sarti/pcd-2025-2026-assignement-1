@@ -43,23 +43,26 @@ func Match(player_1_ch chan int, player_2_ch chan int, winner_ch chan int){
 }
 
 func Round(n_rounds int, players []chan int, winner_ch chan int){
-    round_winners := make([]chan int, int(math.Pow(2, float64(n_rounds-1))))
     n_players := int(math.Pow(2, float64(n_rounds)))
+    n_matches := n_players / 2
+    round_winners := make([]chan int, n_matches)
     for i := 0; i < n_players; i += 2 {
-        match_winner_ch := make(chan int)
-        go Match(players[i], players[i + 1], match_winner_ch)
         round_winners[i / 2] = make(chan int, 1)
-        round_winners[i / 2] <- (<- match_winner_ch)
+        go Match(players[i], players[i + 1], round_winners[i / 2])
+    }
+    //in order to have each round starting after the previous round is done, we need to wait for each match to put the winner its channel - we can do it adding another receiving operation
+    for i := 0; i < n_matches; i++ {
+        round_winners[i] <- (<- round_winners[i])
     }
     if n_rounds == 1 {
         winner_ch <- (<- round_winners[0])
     } else {
         fmt.Printf("New round started! \n")
-        go Round(n_rounds - 1, round_winners, winner_ch)
+        Round(n_rounds - 1, round_winners, winner_ch)
     }
 }
 
-//Tutti i canali sono bufferizzati (di dimensione specificata) perchè un invio su un canale non bufferizzato si blocca se non c'è qualcuno pronto a ricevere in quel preciso istante
+//All channels are buffered (with a specified dimension) because sending a message on a non-buffered channel causes a deadlock if there is nobody listening on the channel yet
 func main() {
     fmt.Println("Tournament started!")
     n_rounds := 5
