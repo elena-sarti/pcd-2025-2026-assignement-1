@@ -10,7 +10,6 @@ type HeadsOrTails struct {
     msg string
 }
 
-
 func Player(msg_ch chan HeadsOrTails){
     var msg string
     if rand.Intn(2) == 0 {
@@ -44,23 +43,22 @@ func Match(match_ch chan int, players []chan int, winner_ch chan int){
     fmt.Printf("Match between players %d and %d won by player %d! \n", player_1, player_2, match_winner)
 }
 
-func Round(n_rounds int, players []chan int){
+func Round(n_rounds int, players []chan int, winner_ch chan int){
     round_winners := make([]chan int, int(math.Pow(2, float64(n_rounds-1))))
     n_players := int(math.Pow(2, float64(n_rounds)))
     for i := 0; i < n_players; i += 2 {
-        match_ch := make(chan int)
-        winner_ch := make(chan int)
-        go Match(match_ch, players, winner_ch)
-        match_ch <- i
+        match_number_ch := make(chan int)
+        match_winner_ch := make(chan int)
+        go Match(match_number_ch, players, match_winner_ch)
+        match_number_ch <- i
         round_winners[i / 2] = make(chan int, 1) //Un invio su un canale non bufferizzato (senza la dimensione specificata) si blocca finché non c'è qualcuno pronto a ricevere in quel preciso istante
-        round_winners[i / 2] <- (<- winner_ch)
+        round_winners[i / 2] <- (<- match_winner_ch)
     }
     if n_rounds == 1 {
-       winner := <- round_winners[0]
-       fmt.Printf("Game winner: player %d!\n", winner)
+        winner_ch <- (<- round_winners[0])
     } else {
         fmt.Printf("New round started! \n")
-        go Round(n_rounds - 1, round_winners)
+        Round(n_rounds - 1, round_winners, winner_ch)
     }
 }
 
@@ -73,6 +71,8 @@ func main() {
         players[i] = make(chan int, 1)
         players[i] <- i
     }
-    go Round(n_rounds, players)
-    for {}
+    winner_ch := make(chan int, 1)
+    Round(n_rounds, players, winner_ch)
+    winner := <- winner_ch
+    fmt.Printf("Game winner: player %d!\n", winner)
 }
