@@ -10,14 +10,15 @@ type HeadsOrTails struct {
     msg string
 }
 
-func Player(msg_ch chan HeadsOrTails){
-    var msg string
+func flipCoin() HeadsOrTails {
     if rand.Intn(2) == 0 {
-        msg = "heads"
-    } else {
-        msg = "tails"
+      return HeadsOrTails{msg: "heads"}
     }
-    msg_ch <- HeadsOrTails{msg: msg}
+    return HeadsOrTails{msg: "tails"}
+}
+
+func Player(msg_ch chan HeadsOrTails){
+    msg_ch <- flipCoin()
 }
 
 func Match(player_1_ch chan int, player_2_ch chan int, winner_ch chan int){
@@ -25,15 +26,10 @@ func Match(player_1_ch chan int, player_2_ch chan int, winner_ch chan int){
     player_2 := <- player_2_ch
     msg_ch := make (chan HeadsOrTails)
     go Player(msg_ch)
-    var winning_msg string
-    if rand.Intn(2) == 0 {
-      winning_msg = "heads"
-    } else {
-      winning_msg = "tails"
-    }
     first_player_msg := <- msg_ch
+    winning_msg := flipCoin()
     var match_winner int
-    if first_player_msg.msg == winning_msg {
+    if first_player_msg == winning_msg {
         match_winner = player_1
     } else {
         match_winner = player_2
@@ -58,7 +54,7 @@ func Round(n_rounds int, players []chan int, winner_ch chan int){
         winner_ch <- (<- round_winners[0])
     } else {
         fmt.Printf("New round started! \n")
-        Round(n_rounds - 1, round_winners, winner_ch)
+        go Round(n_rounds - 1, round_winners, winner_ch)
     }
 }
 
