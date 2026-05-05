@@ -17,19 +17,19 @@ func flipCoin() HeadsOrTails {
     return HeadsOrTails{msg: "tails"}
 }
 
-func Player(msg_ch chan HeadsOrTails){
-    msg_ch <- flipCoin()
+func Player(choice_ch chan HeadsOrTails){
+    choice_ch <- flipCoin()
 }
 
 func Match(player_1_ch chan int, player_2_ch chan int, winner_ch chan int){
     player_1 := <- player_1_ch
     player_2 := <- player_2_ch
-    msg_ch := make (chan HeadsOrTails)
-    go Player(msg_ch)
-    first_player_msg := <- msg_ch
-    winning_msg := flipCoin()
+    choice_ch := make (chan HeadsOrTails)
+    go Player(choice_ch)
+    first_player_choice := <- choice_ch
+    winning_choice := flipCoin()
     var match_winner int
-    if first_player_msg == winning_msg {
+    if first_player_choice == winning_choice {
         match_winner = player_1
     } else {
         match_winner = player_2
