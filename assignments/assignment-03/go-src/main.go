@@ -6,30 +6,30 @@ import (
     "math/rand"
 )
 
-type HeadsOrTails struct {
+type OddOrEven struct {
     msg string
 }
 
-func flipCoin() HeadsOrTails {
+func chooseOddOrEven() OddOrEven {
     if rand.Intn(2) == 0 {
-      return HeadsOrTails{msg: "heads"}
+      return OddOrEven{msg: "odd"}
     }
-    return HeadsOrTails{msg: "tails"}
+    return OddOrEven{msg: "even"}
 }
 
-func Player(choice_ch chan HeadsOrTails){
-    choice_ch <- flipCoin()
+func Player(choice_ch chan OddOrEven){
+    choice_ch <- chooseOddOrEven()
 }
 
 func Match(player_1_ch chan int, player_2_ch chan int, winner_ch chan int){
     player_1 := <- player_1_ch
     player_2 := <- player_2_ch
-    choice_ch := make (chan HeadsOrTails)
+    choice_ch := make (chan OddOrEven)
     go Player(choice_ch)
-    first_player_choice := <- choice_ch
-    winning_choice := flipCoin()
+    player_1_choice := <- choice_ch
+    winning_choice := chooseOddOrEven()
     var match_winner int
-    if first_player_choice == winning_choice {
+    if player_1_choice == winning_choice {
         match_winner = player_1
     } else {
         match_winner = player_2
