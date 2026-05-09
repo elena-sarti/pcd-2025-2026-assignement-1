@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="assignment-03:main [file:/C:/Users/Elena/Desktop/PCD/pcd-2025-2026-assignement-1/assignments/assignment-03/]" external.linked.project.path="$MODULE_DIR$/../../.." external.root.project.path="$MODULE_DIR$/../../.." external.system.id="SBT" external.system.module.type="sbtSourceSet" type="JAVA_MODULE" version="4">
+  <component name="DisplayModuleName">
+    <option name="name" value="assignment-3.main" />
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_25">
+    <output url="file://$MODULE_DIR$/../../../target/scala-3.3.3/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/scala" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../target/scala-3.3.3/resource_managed/main" />
+    <content url="file://$MODULE_DIR$/../../../target/scala-3.3.3/src_managed/main" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sbt: scala-sdk-3.3.3" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.3.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-actor-typed_3:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-stream_3:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-slf4j_3:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: ch.qos.logback:logback-classic:1.4.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-actor_3:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:2.0.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pekko:pekko-protobuf-v3_3:1.0.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivestreams:reactive-streams:1.0.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe:ssl-config-core_3:0.6.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: ch.qos.logback:logback-core:1.4.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe:config:1.4.3:jar" level="project" />
+  </component>
+</module>
