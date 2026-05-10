@@ -36,7 +36,10 @@ object SmartHomeControlSystem:
       Behaviors.receiveMessage:
         case Pin(pin, replyTo) =>
           context.log.info("Pin inserted...")
-          if pin == PIN then replyTo ! Notification.PinInserted else context.log.info("Wrong pin - try again")
+          if pin == PIN then {
+            context.log.info("Correct pin!")
+            replyTo ! Notification.PinInserted
+          } else context.log.info("Wrong pin - try again")
           Behaviors.same
 
   object ControlSystemActor:
@@ -57,7 +60,7 @@ object SmartHomeControlSystem:
           context.log.info(msg)
           Behaviors.same
         case PinInserted =>
-          context.log.info("Correct pin - transitioning to EXIT DELAY status.")
+          context.log.info("Transitioning to EXIT DELAY status.")
           exitDelay()
 
     def exitDelay(): Behavior[Notification] = Behaviors.setup: context =>
@@ -153,16 +156,17 @@ object SmartHomeControlSystem:
   given ec: ExecutionContext = system.executionContext
   val scheduler = system.scheduler
 
-  system ! SensorMessage("motion")
-  system ! SensorMessage("windows")
-  system ! KeypadMessage("0001")
-  scheduler.scheduleOnce(2.seconds, () => system ! KeypadMessage("0000"))
-  system ! SensorMessage("motion")
-  scheduler.scheduleOnce((EXIT_DELAY + 1).seconds, () => system ! SensorMessage("door"))
-  system ! KeypadMessage("0001")
-  system ! KeypadMessage("0000")
-  system ! SensorMessage("motion")
-  scheduler.scheduleOnce(1.seconds, () => system ! KeypadMessage("0000"))
+  //scheduleOnce is not a blocking operation, so the times must increase each time to prevent conflict in the tested sequence of events
+  scheduler.scheduleOnce(500.millis, () => system ! Guardian.Message.SensorMessage("motion"))
+  scheduler.scheduleOnce(600.millis, () => system ! Guardian.Message.SensorMessage("windows"))
+  scheduler.scheduleOnce(1.second, () => system ! Guardian.Message.KeypadMessage("0001"))
+  scheduler.scheduleOnce(2.seconds, () => system ! Guardian.Message.KeypadMessage("0000"))
+  scheduler.scheduleOnce(3.seconds, () => system ! Guardian.Message.SensorMessage("motion"))
+  scheduler.scheduleOnce(9.seconds, () => system ! Guardian.Message.SensorMessage("door"))
+  scheduler.scheduleOnce(10.5.seconds, () => system ! Guardian.Message.KeypadMessage("0001"))
+  scheduler.scheduleOnce(11.seconds, () => system ! Guardian.Message.SensorMessage("motion"))
+  scheduler.scheduleOnce(12.seconds, () => system ! Guardian.Message.KeypadMessage("0000"))
+  scheduler.scheduleOnce(15.seconds, () => system.terminate())
 
 
 
