@@ -1,4 +1,3 @@
-import SmartHomeControlSystem.EXIT_DELAY
 import org.apache.pekko.actor.typed.*
 import org.apache.pekko.actor.typed.scaladsl.*
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
