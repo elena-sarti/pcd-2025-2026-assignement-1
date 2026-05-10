@@ -1,3 +1,4 @@
+import SmartHomeControlSystem.ControlSystemActor.Notification
 import org.apache.pekko.actor.typed.*
 import org.apache.pekko.actor.typed.scaladsl.*
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
@@ -5,43 +6,40 @@ import org.apache.pekko.util.Timeout
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.*
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{Failure, Random, Success}
 
 object SmartHomeControlSystem:
-
   val EXIT_DELAY = 60
   val ENTRY_DELAY = 20
   val PIN = "0000"
 
   object SensorActor:
-    import SystemControlActor.Notification.MotionDetected
-
     enum Signal:
-      case DoorWindowSignal(replyTo: ActorRef[MotionDetected])
-      case MotionSignal(replyTo: ActorRef[MotionDetected])
+      case DoorWindowSignal(replyTo: ActorRef[Notification])
+      case MotionSignal(replyTo: ActorRef[Notification])
 
     def apply(): Behavior[Signal] = Behaviors.receiveMessage:
       case Signal.DoorWindowSignal(replyTo) =>
-        replyTo ! MotionDetected("Detected signal from door or windows")
+        replyTo ! Notification.MotionDetected("Detected signal from door or windows")
         Behaviors.same
       case Signal.MotionSignal(replyTo) =>
-        replyTo ! MotionDetected("Detected motion signal")
+        replyTo ! Notification.MotionDetected("Detected motion signal")
         Behaviors.same
 
   object KeypadActor:
-    import SystemControlActor.Notification.PinInserted
-
     enum Command:
-      case Pin(pin: String, replyTo: ActorRef[Any])
+      case Pin(pin: String, replyTo: ActorRef[Notification])
     export Command.*
 
     def apply(): Behavior[Command] = Behaviors.receiveMessage:
       case Pin(pin, replyTo) if pin == PIN =>
-        replyTo ! PinInserted
+        replyTo ! Notification.PinInserted
+        Behaviors.same
+      case _ =>
+        println("Incorrect pin")
         Behaviors.same
 
-  object SystemControlActor:
+  object ControlSystemActor:
     enum Notification:
       case MotionDetected(msg: String)
       case PinInserted
@@ -91,8 +89,33 @@ object SmartHomeControlSystem:
       case PinInserted => disarmed()
       case _ =>
         println("ALARM!")
-        alarm()
+        Behaviors.same
 
+  object Guardian:
+    import KeypadActor.Command.*
+    import SensorActor.Signal.*
+
+    enum Message:
+      case SensorMessage(sensor: String)
+      case KeypadMessage(pin: String)
+    export Message.*
+
+    def apply(): Behavior[Message] = Behaviors.setup:
+      context =>
+        val controller = context.spawn(ControlSystemActor(), "Hello alarm controller")
+        val sensor = context.spawn(SensorActor(), "Hello sensor")
+        val keypad = context.spawn(KeypadActor(), "Hello keypad")
+        Behaviors.receiveMessage:
+          case SensorMessage(msg) =>
+            sensor ! (if msg == "motion" then MotionSignal(controller) else DoorWindowSignal(controller))
+            Behaviors.same
+          case KeypadMessage(pin) =>
+            keypad ! Pin(pin, controller)
+            Behaviors.same
+
+@main def runControlSystem(): Unit =
+  import SmartHomeControlSystem.*
+  val system = ActorSystem(Guardian(), "Hello control system")
 
 
 
