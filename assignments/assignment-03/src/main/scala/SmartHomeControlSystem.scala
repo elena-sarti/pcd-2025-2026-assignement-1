@@ -13,38 +13,40 @@ object SmartHomeControlSystem:
   object SensorActor:
     import ControlSystemActor.Notification
     enum Signal:
-      case DoorWindowSignal(replyTo: ActorRef[Notification])
-      case MotionSignal(replyTo: ActorRef[Notification])
+      case DoorWindowSignal(zone: String, replyTo: ActorRef[Notification])
+      case MotionSignal(zone: String, replyTo: ActorRef[Notification])
 
     def apply(): Behavior[Signal] = Behaviors.setup: context =>
       Behaviors.receiveMessage:
-        case Signal.DoorWindowSignal(replyTo) =>
-          replyTo ! Notification.MotionDetected("Detected signal from door or windows!")
+        case Signal.DoorWindowSignal(zone, replyTo) =>
+          replyTo ! Notification.MotionDetected(zone, "Detected signal from door or windows ")
           Behaviors.same
-        case Signal.MotionSignal(replyTo) =>
-          replyTo ! Notification.MotionDetected("Detected motion signal!")
+        case Signal.MotionSignal(zone, replyTo) =>
+          replyTo ! Notification.MotionDetected(zone, "Detected motion signal ")
           Behaviors.same
 
   object KeypadActor:
     import ControlSystemActor.Notification
+
     enum Command:
-      case Pin(pin: String, replyTo: ActorRef[Notification])
+      case Pin(pin: String, replyTo: ActorRef[Notification], zonesToArm: String*)
     export Command.*
 
     def apply(): Behavior[Command] = Behaviors.setup: context =>
       Behaviors.receiveMessage:
-        case Pin(pin, replyTo) =>
+        case Pin(pin, replyTo, zones*) =>
           context.log.info("Pin inserted...")
           if pin == PIN then {
             context.log.info("Correct pin!")
-            replyTo ! Notification.PinInserted
+            replyTo ! Notification.PinInserted(zones*)
           } else context.log.info("Wrong pin - try again")
           Behaviors.same
 
   object ControlSystemActor:
+
     enum Notification:
-      case MotionDetected(msg: String)
-      case PinInserted
+      case MotionDetected(zone: String, msg: String)
+      case PinInserted(zonesToArm: String*)
       case TimeoutReached
     export Notification.*
 
@@ -55,32 +57,35 @@ object SmartHomeControlSystem:
     def disarmed(): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info("Currently in DISARMED status.")
       Behaviors.receiveMessage:
-        case MotionDetected(msg) =>
-          context.log.info(msg)
+        case MotionDetected(zone, msg) =>
+          context.log.info(msg + s"in $zone!")
           Behaviors.same
-        case PinInserted =>
+        case PinInserted(zones*) =>
           context.log.info("Transitioning to EXIT DELAY status.")
-          exitDelay()
+          exitDelay(zones*)
 
-    def exitDelay(): Behavior[Notification] = Behaviors.setup: context =>
+    def exitDelay(zones: String*): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info(s"Currently in EXIT DELAY status: transitioning to ARMED status in ${EXIT_DELAY} seconds.")
       Behaviors.withTimers:
         timers =>
           timers.startSingleTimer(TimeoutReached, EXIT_DELAY.seconds)
           Behaviors.receiveMessage:
-            case TimeoutReached => armed()
-            case MotionDetected(msg) =>
-              context.log.info(msg)
+            case TimeoutReached => armed(zones*)
+            case MotionDetected(zone, msg) =>
+              context.log.info(msg + s"in $zone!")
               Behaviors.same
             case _ => Behaviors.same
 
-    def armed(): Behavior[Notification] = Behaviors.setup: context =>
+    def armed(zones: String*): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info("Currently in ARMED status.")
       Behaviors.receiveMessage:
-        case PinInserted => disarmed()
-        case MotionDetected(msg) =>
-          context.log.info("ATTENTION! " + msg + " Transitioning to ENTRY DELAY status.")
+        case PinInserted(_) => disarmed()
+        case MotionDetected(zone, msg) if zones.contains(zone) =>
+          context.log.info("ATTENTION! " + msg + s"in ${zone}! Transitioning to ENTRY DELAY status.")
           entrydelay()
+        case MotionDetected(zone, msg) =>
+          context.log.info(msg + s"in $zone!")
+          Behaviors.same
 
     def entrydelay(): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info(s"Currently in ENTRY DELAY status: transitioning to ALARM status in $ENTRY_DELAY seconds.")
@@ -88,19 +93,19 @@ object SmartHomeControlSystem:
         timers =>
           timers.startSingleTimer(TimeoutReached, ENTRY_DELAY.seconds)
           Behaviors.receiveMessage:
-            case PinInserted =>
+            case PinInserted(_*) =>
               context.log.info("Correct pin - transitioning to DISARMED status.")
               timers.cancel(TimeoutReached)
               disarmed()
             case TimeoutReached => alarm()
-            case MotionDetected(msg) =>
-              context.log.info(msg)
+            case MotionDetected(zone, msg) =>
+              context.log.info(msg + s"in $zone!")
               Behaviors.same
 
     def alarm(): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info("ATTENTION! CURRENTLY IN ALARM STATUS!")
       Behaviors.receiveMessage:
-        case PinInserted => disarmed()
+        case PinInserted(_*) => disarmed()
         case _ =>
           context.log.info("ALARM!")
           Behaviors.same
@@ -110,8 +115,8 @@ object SmartHomeControlSystem:
     import SensorActor.Signal.*
 
     enum Message:
-      case SensorMessage(sensor: String)
-      case KeypadMessage(pin: String)
+      case SensorMessage(sensor: String, zone: String)
+      case KeypadMessage(pin: String, zonesToArm: String*)
     export Message.*
 
     def apply() : Behavior[Message] = Behaviors.setup:
@@ -136,11 +141,11 @@ object SmartHomeControlSystem:
         )
         Behaviors
           .receiveMessage[Message]:
-            case SensorMessage(msg) =>
-              sensor ! (if msg == "motion" then MotionSignal(controller) else DoorWindowSignal(controller))
+            case SensorMessage(msg, zone) =>
+              sensor ! (if msg == "motion" then MotionSignal(zone, controller) else DoorWindowSignal(zone, controller))
               Behaviors.same
-            case KeypadMessage(pin) =>
-              keypad ! Pin(pin, controller)
+            case KeypadMessage(pin, zones*) =>
+              keypad ! Pin(pin, controller, zones*)
               Behaviors.same
           .receiveSignal:
             case (ctx, PostStop) =>
@@ -152,20 +157,33 @@ object SmartHomeControlSystem:
   import Guardian.Message.*
   val system = ActorSystem(Guardian(), "control-system")
 
+  //dispatcher for the actors of the system - schedules and executes actor message processing and asynchronous tasks
   given ec: ExecutionContext = system.executionContext
   val scheduler = system.scheduler
 
   //scheduleOnce is not a blocking operation, so the times must increase each time to prevent conflict in the tested sequence of events
-  scheduler.scheduleOnce(500.millis, () => system ! Guardian.Message.SensorMessage("motion"))
-  scheduler.scheduleOnce(600.millis, () => system ! Guardian.Message.SensorMessage("windows"))
-  scheduler.scheduleOnce(1.second, () => system ! Guardian.Message.KeypadMessage("0001"))
-  scheduler.scheduleOnce(2.seconds, () => system ! Guardian.Message.KeypadMessage("0000"))
-  scheduler.scheduleOnce(3.seconds, () => system ! Guardian.Message.SensorMessage("motion"))
-  scheduler.scheduleOnce(9.seconds, () => system ! Guardian.Message.SensorMessage("door"))
-  scheduler.scheduleOnce(10.5.seconds, () => system ! Guardian.Message.KeypadMessage("0001"))
-  scheduler.scheduleOnce(11.seconds, () => system ! Guardian.Message.SensorMessage("motion"))
-  scheduler.scheduleOnce(12.seconds, () => system ! Guardian.Message.KeypadMessage("0000"))
-  scheduler.scheduleOnce(15.seconds, () => system.terminate())
+  //disarmed status
+  scheduler.scheduleOnce(500.millis, () => system ! Guardian.Message.SensorMessage("motion", "living room"))
+  scheduler.scheduleOnce(1.second, () => system ! Guardian.Message.KeypadMessage("0001", "perimeter"))
+
+  //exit delay status
+  scheduler.scheduleOnce(2.seconds, () => system ! Guardian.Message.KeypadMessage("0000", "perimeter", "living room"))
+  scheduler.scheduleOnce(5.seconds, () => system ! Guardian.Message.SensorMessage("motion", "living room"))
+  scheduler.scheduleOnce(7.seconds, () => system ! Guardian.Message.SensorMessage("windows", "perimeter"))
+
+  //armed status
+  scheduler.scheduleOnce(10.seconds, () => system ! Guardian.Message.SensorMessage("motion", "sleeping zone"))
+  scheduler.scheduleOnce(12.seconds, () => system ! Guardian.Message.SensorMessage("door", "sleeping zone"))
+
+  //transition to entry delay status
+  scheduler.scheduleOnce(13.seconds, () => system ! Guardian.Message.SensorMessage("windows", "perimeter"))
+  scheduler.scheduleOnce(14.seconds, () => system ! Guardian.Message.KeypadMessage("1111"))
+  scheduler.scheduleOnce(15.seconds, () => system ! Guardian.Message.SensorMessage("motion", "living room"))
+
+  //transition back to disarmed status
+  scheduler.scheduleOnce(16.seconds, () => system ! Guardian.Message.KeypadMessage("0000"))
+  scheduler.scheduleOnce(17.seconds, () => system ! Guardian.Message.SensorMessage("motion", "perimeter"))
+  scheduler.scheduleOnce(18.seconds, () => system.terminate())
 
 
 
