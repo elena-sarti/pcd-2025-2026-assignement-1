@@ -63,6 +63,7 @@ object SmartHomeControlSystem:
         case PinInserted(zones*) =>
           context.log.info("Transitioning to EXIT DELAY status.")
           exitDelay(zones*)
+        case _ => Behaviors.same
 
     def exitDelay(zones: String*): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info(s"Currently in EXIT DELAY status: transitioning to ARMED status in ${EXIT_DELAY} seconds.")
@@ -79,15 +80,17 @@ object SmartHomeControlSystem:
     def armed(zones: String*): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info("Currently in ARMED status.")
       Behaviors.receiveMessage:
-        case PinInserted(_) => disarmed()
+        case PinInserted(_) =>
+          disarmed()
         case MotionDetected(zone, msg) if zones.contains(zone) =>
           context.log.info("ATTENTION! " + msg + s"in ${zone}! Transitioning to ENTRY DELAY status.")
-          entrydelay()
+          entrydelay(zones*)
         case MotionDetected(zone, msg) =>
           context.log.info(msg + s"in $zone!")
           Behaviors.same
+        case _ => Behaviors.same
 
-    def entrydelay(): Behavior[Notification] = Behaviors.setup: context =>
+    def entrydelay(zones: String*): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info(s"Currently in ENTRY DELAY status: transitioning to ALARM status in $ENTRY_DELAY seconds.")
       Behaviors.withTimers:
         timers =>
@@ -104,11 +107,11 @@ object SmartHomeControlSystem:
 
     def alarm(): Behavior[Notification] = Behaviors.setup: context =>
       context.log.info("ATTENTION! CURRENTLY IN ALARM STATUS!")
+      context.log.info("ALARM!")
       Behaviors.receiveMessage:
-        case PinInserted(_*) => disarmed()
-        case _ =>
-          context.log.info("ALARM!")
-          Behaviors.same
+        case PinInserted(_*) =>
+          disarmed()
+        case _ => Behaviors.same
 
   object Guardian:
     import KeypadActor.Command.*
