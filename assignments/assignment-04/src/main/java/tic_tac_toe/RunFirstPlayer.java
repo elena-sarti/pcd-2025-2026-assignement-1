@@ -11,6 +11,7 @@ public class RunFirstPlayer {
     private static final String GAME_NAME = "Tic Tac Toe Game";
 
     public static void main(String[] args){
+
         try {
             ControllerImpl controller = new ControllerImpl();
             Controller contrProxy = (Controller) UnicastRemoteObject.exportObject(controller, 0);

@@ -1,36 +1,29 @@
 package tic_tac_toe.controller;
+import tic_tac_toe.view.GameView;
 
 import java.rmi.RemoteException;
-import java.util.Scanner;
 
 public class RemoteControllerImpl implements RemoteController {
     private final Controller controller;
-    private final Scanner scanner;
+    private final GameView view;
 
     public RemoteControllerImpl(Controller controller){
         this.controller = controller;
-        this.scanner = new Scanner(System.in);
+        view = new GameView();
     }
 
     public void receiveMessage(Message msg) {
-        if (msg.getContent().equals("Move not valid")) {
-            System.out.println("Move not valid.");
+        System.out.println(msg.getContent());
+        if (msg.getContent().equals("Move not valid.")) {
             myTurn();
-        } else {
-            System.out.println(msg.getContent());
         }
     }
 
     public void myTurn(){
-        System.out.println("It's your turn! Insert your move.");
-        System.out.println("Row: ");
-        int r = scanner.nextInt();
-        System.out.println("Col: ");
-        int c = scanner.nextInt();
-        try{
-            controller.writeX(r, c);
+        int[] coords = view.askForMove();
+        try {
+            controller.writeX(coords[0], coords[1]);
         } catch (RemoteException e) {
-            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
