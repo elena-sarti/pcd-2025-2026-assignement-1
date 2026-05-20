@@ -1,5 +1,6 @@
 package tic_tac_toe;
 
+import tic_tac_toe.controller.Controller;
 import tic_tac_toe.controller.ControllerImpl;
 
 import java.rmi.registry.LocateRegistry;
@@ -12,7 +13,7 @@ public class RunFirstPlayer {
     public static void main(String[] args){
         try {
             ControllerImpl controller = new ControllerImpl();
-            ControllerImpl contrProxy = (ControllerImpl) UnicastRemoteObject.exportObject(controller, 0);
+            Controller contrProxy = (Controller) UnicastRemoteObject.exportObject(controller, 0);
 
             var registry = LocateRegistry.getRegistry();
             registry.rebind(GAME_NAME, contrProxy);

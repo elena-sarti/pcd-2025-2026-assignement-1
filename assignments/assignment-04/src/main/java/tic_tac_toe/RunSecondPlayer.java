@@ -1,6 +1,7 @@
 package tic_tac_toe;
 
 import tic_tac_toe.controller.Controller;
+import tic_tac_toe.controller.RemoteController;
 import tic_tac_toe.controller.RemoteControllerImpl;
 
 import java.rmi.registry.LocateRegistry;
@@ -16,7 +17,7 @@ public class RunSecondPlayer {
             var c = (Controller) registry.lookup("Tic Tac Toe Game");
 
             RemoteControllerImpl localC = new RemoteControllerImpl(c);
-            RemoteControllerImpl localContrProxy = (RemoteControllerImpl) UnicastRemoteObject.exportObject(localC, 0);
+            RemoteController localContrProxy = (RemoteControllerImpl) UnicastRemoteObject.exportObject(localC, 0);
 
             c.addAdversary(localContrProxy);
             System.out.println("Player connected to the game: the game can start! Wait for your turn.");
