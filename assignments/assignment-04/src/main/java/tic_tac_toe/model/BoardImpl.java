@@ -35,16 +35,16 @@ public class BoardImpl implements Board{
     }
 
     public Boolean isValid(int row, int col){
-        return grid[row][col].isEmpty() &&
-                row >= 0 && row < rows &&
-                col >= 0 && col < cols;
+        return row >= 0 && row < rows &&
+                col >= 0 && col < cols &&
+                grid[row][col].isEmpty();
     }
 
     public Boolean isFull() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (grid[i][j].isEmpty()) {
-                    return false; // C'è ancora almeno uno spazio vuoto!
+                    return false;
                 }
             }
         }
