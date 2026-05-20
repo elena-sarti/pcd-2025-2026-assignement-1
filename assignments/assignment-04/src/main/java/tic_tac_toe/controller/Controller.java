@@ -10,4 +10,5 @@ public interface Controller extends Remote {
     public void writeO(int row, int col) throws RemoteException;
 
     public void addAdversary(RemoteController adv) throws RemoteException;
+
 }

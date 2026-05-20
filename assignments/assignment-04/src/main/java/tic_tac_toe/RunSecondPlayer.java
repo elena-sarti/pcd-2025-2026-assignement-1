@@ -19,7 +19,8 @@ public class RunSecondPlayer {
             RemoteControllerImpl localContrProxy = (RemoteControllerImpl) UnicastRemoteObject.exportObject(localC, 0);
 
             c.addAdversary(localContrProxy);
-            System.out.println("Player connected to the game.");
+            System.out.println("Player connected to the game: the game can start! Wait for your turn.");
+
         } catch (Exception e) {
             System.out.println("Client exception: " + e.toString());
             e.printStackTrace();

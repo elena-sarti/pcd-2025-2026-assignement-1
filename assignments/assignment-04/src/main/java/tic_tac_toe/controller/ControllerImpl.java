@@ -66,11 +66,14 @@ public class ControllerImpl implements Controller {
             }
         } else {
             System.out.println("Move not valid");
+            myTurn();
         }
     }
 
     public void addAdversary(RemoteController adversary){
         this.adversary = adversary;
+        System.out.println("Player connected: the game starts!");
+        myTurn();
     }
 
     private void myTurn(){

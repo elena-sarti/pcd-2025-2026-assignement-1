@@ -7,7 +7,7 @@ public class RemoteControllerImpl implements RemoteController {
     private final Controller controller;
     private final Scanner scanner;
 
-    public RemoteControllerImpl(Controller controller, Scanner scanner){
+    public RemoteControllerImpl(Controller controller){
         this.controller = controller;
         this.scanner = new Scanner(System.in);
     }
