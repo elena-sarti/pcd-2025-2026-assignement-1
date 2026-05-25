@@ -2,48 +2,18 @@ package threads.model;
 
 import java.util.List;
 
-public class Board {
+public interface Board {
+    void init(BoardConf conf);
 
-    private List<Ball> balls;
-    private Ball playerBall;
-    private Ball botBall;
-    private Boundary bounds;
-    private List<Hole> holes;
-    private SpatialGrid grid;
+    List<BallImpl> getBalls();
 
-    public Board(){}
+    BallImpl getPlayerBall();
 
-    public void init(BoardConf conf) {
-        this.balls = conf.getSmallBalls();
-        this.playerBall = conf.getPlayerBall();
-        this.botBall = conf.getBotBall();
-        this.bounds = conf.getBoardBoundary();
-        this.holes = conf.getHoles();
-        this.grid = new SpatialGrid(60, 60, bounds);
-    }
+    BallImpl getBotBall();
 
-    public List<Ball> getBalls() {
-        return balls;
-    }
+    List<Hole> getHoles();
 
-    public Ball getPlayerBall() {
-        return playerBall;
-    }
+    Boundary getBounds();
 
-    public Ball getBotBall() {
-        return botBall;
-    }
-
-    public List<Hole> getHoles() {
-        return holes;
-    }
-
-    public Boundary getBounds() {
-        return bounds;
-    }
-
-    public SpatialGrid getGrid() {
-        return grid;
-    }
-
+    SpatialGridImpl getGrid();
 }

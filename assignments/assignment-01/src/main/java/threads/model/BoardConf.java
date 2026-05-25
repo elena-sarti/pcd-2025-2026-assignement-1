@@ -8,9 +8,9 @@ public interface BoardConf {
 
     List<Hole> getHoles();
 	
-	Ball getPlayerBall();
+	BallImpl getPlayerBall();
 
-    Ball getBotBall();
+    BallImpl getBotBall();
 	
-	List<Ball> getSmallBalls();
+	List<BallImpl> getSmallBalls();
 }

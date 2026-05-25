@@ -1,85 +1,28 @@
 package threads.view;
 
-import threads.controller.GameStateManager;
-import threads.model.*;
+import threads.controller.GameStateManagerImpl;
+import threads.model.BoardImpl;
 
 import java.util.ArrayList;
 
-public class ViewModel {
+public interface ViewModel {
+    void update(BoardImpl board, GameStateManagerImpl gameStateManager, int framePerSec);
 
-	private ArrayList<BallViewInfo> balls;
-	private BallViewInfo player;
-    private BallViewInfo bot;
-    private ArrayList<BallViewInfo> holes;
-	private int framePerSec;
-    private int playerScore = 0;
-    private int botScore = 0;
-    private volatile boolean gameOver = false;
-    private String endMessage = "";
-	
-	public ViewModel() {
-		balls = new ArrayList<>();
-        holes = new ArrayList<>();
-		framePerSec = 0;
-	}
-	
-	public synchronized void update(Board board, GameStateManager gameStateManager, int framePerSec) {
-        this.playerScore = gameStateManager.getCountMonitor().getPlayerScore();
-        this.botScore = gameStateManager.getCountMonitor().getBotScore();
-        this.gameOver = gameStateManager.isGameOver();
-        this.endMessage = gameStateManager.getEndMessage();
-        holes.clear();
-        for (var h: board.getHoles()) {
-            holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
-        }
-		balls.clear();
-		for (var b: board.getBalls()) {
-			balls.add(new BallViewInfo(b.getPos(), b.getRadius()));
-		}
-		this.framePerSec = framePerSec;
-		var p = board.getPlayerBall();
-		player = new BallViewInfo(p.getPos(), p.getRadius());
-        var b = board.getBotBall();
-        bot = new BallViewInfo(b.getPos(), b.getRadius());
-	}
-	
-	public synchronized ArrayList<BallViewInfo> getBalls(){
-		var copy = new ArrayList<BallViewInfo>();
-		copy.addAll(balls);
-		return copy;
-	}
+    ArrayList<BallViewInfo> getBalls();
 
-    public synchronized ArrayList<BallViewInfo> getHoles(){
-        var copy = new ArrayList<BallViewInfo>();
-        copy.addAll(holes);
-        return copy;
-    }
+    ArrayList<BallViewInfo> getHoles();
 
-	public synchronized int getFramePerSec() {
-		return framePerSec;
-	}
+    int getFramePerSec();
 
-	public synchronized BallViewInfo getPlayerBall() {
-		return player;
-	}
+    BallViewInfo getPlayerBall();
 
-    public synchronized BallViewInfo getBotBall(){
-        return bot;
-    }
+    BallViewInfo getBotBall();
 
-    public synchronized int getPlayerScore(){
-        return playerScore;
-    }
+    int getPlayerScore();
 
-    public synchronized int getBotScore(){
-        return botScore;
-    }
+    int getBotScore();
 
-    public synchronized boolean isGameOver(){
-        return gameOver;
-    }
+    boolean isGameOver();
 
-    public synchronized String getEndMessage(){
-        return endMessage;
-    }
+    String getEndMessage();
 }
