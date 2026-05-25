@@ -1,6 +1,7 @@
 package cluster
 
 import com.typesafe.config.ConfigFactory
+import org.apache.pekko.actor.typed.SupervisorStrategy
 import org.apache.pekko.actor.typed.scaladsl.Behaviors
 import org.apache.pekko.actor.typed.{ActorSystem, Behavior}
 import org.apache.pekko.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity}
@@ -12,9 +13,11 @@ object SmartHomeControlSystem:
   case object InsertPin extends Command
   case object TriggerUnarmedZone extends Command
   case object TriggerArmedZone extends Command
+  case object UnlockSystem extends Command
 
   def rootBehavior(): Behavior[Command] = Behaviors.setup: context =>
     val sharding = ClusterSharding(context.system)
+    val supervisorStrategy = SupervisorStrategy.restart
 
     val sensorEntity = sharding.init(Entity(typeKey = Sensor.TypeKey): entityContext =>
       Sensor(entityContext.entityId)
@@ -25,22 +28,30 @@ object SmartHomeControlSystem:
     )
 
     val alarmControlSystemEntity = sharding.init(Entity(typeKey = AlarmControlSystem.TypeKey): entityContext =>
-      AlarmControlSystem(entityContext.entityId)
+      Behaviors
+        .supervise(AlarmControlSystem(entityContext.entityId))
+        .onFailure[Exception](supervisorStrategy)
     )
 
-    //Simulation using the node on a random port
+    //Running a simulation on the node different from the seed nodes
     val currentPort = context.system.address.port.getOrElse(0)
     if currentPort != 25251 && currentPort != 25252 then
       context.log.info(s"[TEST NODE $currentPort] Starting timed simulation in 5 seconds...")
       Behaviors.withTimers: timers =>
-        // Phase 1: After 5s, the user types the PIN on the keypad to arm the system
+        timers.startSingleTimer(UnlockSystem, 1.seconds)
+        // After 5s, the user types the PIN on the keypad to arm the system
         timers.startSingleTimer(InsertPin, 5.seconds)
-        // Phase 2: After 8s, a sensor detects motion in an unprotected zone (nothing should happen)
+        // After 8s, a sensor detects motion in an unprotected zone (nothing should happen)
         timers.startSingleTimer(TriggerUnarmedZone, 8.seconds)
-        // Phase 3: After 15s (after the 6s exit delay expires), a sensor triggers the armed zone
+        // After 15s (after the 6s exit delay expires), a sensor triggers the armed zone
         timers.startSingleTimer(TriggerArmedZone, 15.seconds)
 
         Behaviors.receiveMessage:
+          case UnlockSystem =>
+            context.log.info("[SIMULATION] -> Action: Submitting correct PIN to enter disarmed status")
+            val keypadRef = sharding.entityRefFor(Keypad.TypeKey, "keypad-recovery")
+            keypadRef ! Keypad.Pin("0000", List())
+            Behaviors.same
           case InsertPin =>
             context.log.info("[SIMULATION] -> Action: Submitting correct PIN to arm 'Day-Zone'")
             val keypadRef = sharding.entityRefFor(Keypad.TypeKey, "keypad-entrance")

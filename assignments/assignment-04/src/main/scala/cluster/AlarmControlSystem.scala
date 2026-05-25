@@ -17,12 +17,20 @@ object AlarmControlSystem:
   sealed trait Notification extends CborSerializable
   final case class MotionDetected(zone: String, msg: String) extends Notification
   final case class PinInserted(zonesToArm: List[String]) extends Notification
-  final case class TimeoutReached() extends Notification
+  case object TimeoutReached extends Notification
 
   def apply(entityId: String): Behavior[Notification] = Behaviors.setup: context =>
     val sharding = ClusterSharding(context.system)
-    context.log.info("Welcome! Smart home control system ACTIVATED.")
-    disarmed()
+    context.log.info("Welcome! Smart home control system ACTIVATED/RESTARTED.")
+    safeRecoveryMode()
+
+  def safeRecoveryMode(): Behavior[Notification] = Behaviors.setup: context =>
+    context.log.info("Currently in SAFE RECOVERY MODE: enter the pin to use the alarm control system.")
+    Behaviors.receiveMessage:
+      case PinInserted(_) =>
+        disarmed()
+      case _ =>
+        Behaviors.same
 
   def disarmed(): Behavior[Notification] = Behaviors.setup: context =>
     context.log.info("Currently in DISARMED status.")
@@ -39,9 +47,9 @@ object AlarmControlSystem:
     context.log.info(s"Currently in EXIT DELAY status: transitioning to ARMED status in ${EXIT_DELAY} seconds.")
     Behaviors.withTimers:
       timers =>
-        timers.startSingleTimer(TimeoutReached(), EXIT_DELAY.seconds)
+        timers.startSingleTimer(TimeoutReached, EXIT_DELAY.seconds)
         Behaviors.receiveMessage:
-          case TimeoutReached() => armed(zones)
+          case TimeoutReached => armed(zones)
           case MotionDetected(zone, msg) =>
             context.log.info(msg + s" SENSOR in $zone triggered!")
             Behaviors.same
@@ -64,13 +72,13 @@ object AlarmControlSystem:
     context.log.info(s"Currently in ENTRY DELAY status: transitioning to ALARM status in $ENTRY_DELAY seconds.")
     Behaviors.withTimers:
       timers =>
-        timers.startSingleTimer(TimeoutReached(), ENTRY_DELAY.seconds)
+        timers.startSingleTimer(TimeoutReached, ENTRY_DELAY.seconds)
         Behaviors.receiveMessage:
           case PinInserted(_) =>
             context.log.info("Correct pin - transitioning to DISARMED status.")
-            timers.cancel(TimeoutReached())
+            timers.cancel(TimeoutReached)
             disarmed()
-          case TimeoutReached() => alarm()
+          case TimeoutReached => alarm()
           case MotionDetected(zone, msg) =>
             context.log.info(msg + s" SENSOR in $zone triggered!")
             Behaviors.same
