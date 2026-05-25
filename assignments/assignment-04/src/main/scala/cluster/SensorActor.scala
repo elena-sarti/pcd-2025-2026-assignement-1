@@ -3,24 +3,20 @@ package cluster
 import org.apache.pekko.actor.typed.*
 import org.apache.pekko.actor.typed.scaladsl.*
 import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
+import org.apache.pekko.cluster.sharding.typed.scaladsl.ClusterSharding
 import org.apache.pekko.cluster.sharding.typed.scaladsl.EntityTypeKey
 
 object SensorActor:
+  val TypeKey: EntityTypeKey[Signal] = EntityTypeKey[Signal]("Sensor")
   
-  val TypeKey: EntityTypeKey[Signal] = EntityTypeKey[Signal]("Sensor")  
-  
-  sealed trait Signal extends CborSerializable
-  final case class DoorWindowSignal(zone: String, replyTo: ActorRef[SignalDetected]) extends Signal
-  final case class MotionSignal(zone: String, replyTo: ActorRef[SignalDetected]) extends Signal
-
-  final case class SignalDetected(entityId: String, zone: String) extends CborSerializable
+  sealed trait Command extends CborSerializable
+  final case class Signal(zone: String) extends Command
   
   def apply(entityId: String): Behavior[Signal] = Behaviors.setup: context =>
+    val sharding = ClusterSharding(context.system)
     Behaviors.receiveMessage:
-      case DoorWindowSignal(zone, replyTo) =>
-        replyTo ! SignalDetected(entityId, zone)
+      case Signal(zone) =>
+        context.log.info(s"Sensor $entityId in zone $zone triggered!")
+        val alarmControlSystemActor = sharding.entityRefFor(AlarmControlSystem.TypeKey, "Alarm-control-unit")
+        alarmControlSystemActor ! AlarmControlSystem.MotionDetected(zone, entityId)
         Behaviors.same
-      case MotionSignal(zone, replyTo) =>
-        replyTo ! SignalDetected(entityId, zone)
-        Behaviors.same
-
