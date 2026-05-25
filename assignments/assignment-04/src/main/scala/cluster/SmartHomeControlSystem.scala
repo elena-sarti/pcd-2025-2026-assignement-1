@@ -38,8 +38,9 @@ object SmartHomeControlSystem:
     if currentPort != 25251 && currentPort != 25252 then
       context.log.info(s"[TEST NODE $currentPort] Starting timed simulation in 5 seconds...")
       Behaviors.withTimers: timers =>
+        // After 1s, the user enters the pin to unlock the system
         timers.startSingleTimer(UnlockSystem, 1.seconds)
-        // After 5s, the user types the PIN on the keypad to arm the system
+        // After 5s, the user enters the pin to arm the system
         timers.startSingleTimer(InsertPin, 5.seconds)
         // After 8s, a sensor detects motion in an unprotected zone (nothing should happen)
         timers.startSingleTimer(TriggerUnarmedZone, 8.seconds)
