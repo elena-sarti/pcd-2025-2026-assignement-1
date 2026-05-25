@@ -6,14 +6,14 @@ import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.cluster.sharding.typed.scaladsl.ClusterSharding
 import org.apache.pekko.cluster.sharding.typed.scaladsl.EntityTypeKey
 
-object KeypadActor:
+object Keypad:
   val PIN = "0000"
-  val TypeKey: EntityTypeKey[Pin] = EntityTypeKey[Pin]("Keypad")
+  val TypeKey: EntityTypeKey[Command] = EntityTypeKey[Command]("Keypad")
 
   sealed trait Command extends CborSerializable
   final case class Pin(pin: String, zonesToArm: List[String]) extends Command
 
-  def apply(): Behavior[Command] = Behaviors.setup: context =>
+  def apply(entityId: String): Behavior[Command] = Behaviors.setup: context =>
     //initializing sharding on this node
     val sharding = ClusterSharding(context.system)
     Behaviors.receiveMessage:

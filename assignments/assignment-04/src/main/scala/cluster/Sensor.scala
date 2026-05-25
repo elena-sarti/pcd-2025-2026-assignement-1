@@ -6,9 +6,9 @@ import org.apache.pekko.actor.typed.scaladsl.AskPattern.*
 import org.apache.pekko.cluster.sharding.typed.scaladsl.ClusterSharding
 import org.apache.pekko.cluster.sharding.typed.scaladsl.EntityTypeKey
 
-object SensorActor:
+object Sensor:
   val TypeKey: EntityTypeKey[Signal] = EntityTypeKey[Signal]("Sensor")
-  
+
   sealed trait Command extends CborSerializable
   final case class Signal(zone: String) extends Command
   
@@ -16,7 +16,7 @@ object SensorActor:
     val sharding = ClusterSharding(context.system)
     Behaviors.receiveMessage:
       case Signal(zone) =>
-        context.log.info(s"Sensor $entityId in zone $zone triggered!")
+        context.log.info(s"$entityId sensor in zone $zone triggered!")
         val alarmControlSystemActor = sharding.entityRefFor(AlarmControlSystem.TypeKey, "Alarm-control-unit")
         alarmControlSystemActor ! AlarmControlSystem.MotionDetected(zone, entityId)
         Behaviors.same

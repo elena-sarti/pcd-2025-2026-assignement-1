@@ -28,7 +28,7 @@ object AlarmControlSystem:
     context.log.info("Currently in DISARMED status.")
     Behaviors.receiveMessage:
       case MotionDetected(zone, msg) =>
-        context.log.info(msg + s"in $zone!")
+        context.log.info(msg + s" SENSOR in $zone triggered!")
         Behaviors.same
       case PinInserted(zones) =>
         context.log.info("Transitioning to EXIT DELAY status.")
@@ -43,7 +43,7 @@ object AlarmControlSystem:
         Behaviors.receiveMessage:
           case TimeoutReached() => armed(zones)
           case MotionDetected(zone, msg) =>
-            context.log.info(msg + s"in $zone!")
+            context.log.info(msg + s" SENSOR in $zone triggered!")
             Behaviors.same
           case _ => Behaviors.same
 
@@ -53,10 +53,10 @@ object AlarmControlSystem:
       case PinInserted(_) =>
         disarmed()
       case MotionDetected(zone, msg) if zones.contains(zone) =>
-        context.log.info("ATTENTION! " + msg + s"in ${zone}! Transitioning to ENTRY DELAY status.")
+        context.log.info("ATTENTION! " + msg + s" SENSOR in $zone triggered! Transitioning to ENTRY DELAY status.")
         entrydelay(zones)
       case MotionDetected(zone, msg) =>
-        context.log.info(msg + s"in $zone!")
+        context.log.info(msg + s" SENSOR in $zone triggered!")
         Behaviors.same
       case _ => Behaviors.same
 
@@ -72,7 +72,7 @@ object AlarmControlSystem:
             disarmed()
           case TimeoutReached() => alarm()
           case MotionDetected(zone, msg) =>
-            context.log.info(msg + s"in $zone!")
+            context.log.info(msg + s" SENSOR in $zone triggered!")
             Behaviors.same
 
   def alarm(): Behavior[Notification] = Behaviors.setup: context =>
