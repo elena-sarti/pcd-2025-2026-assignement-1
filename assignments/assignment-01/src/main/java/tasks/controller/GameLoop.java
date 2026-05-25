@@ -1,19 +1,19 @@
 package tasks.controller;
 
 import tasks.model.BoardImpl;
-import tasks.view.View;
+import tasks.view.ViewImpl;
 import tasks.view.ViewModelImpl;
 
 public class GameLoop extends Thread {
 
     private ViewModelImpl viewModel;
     private BoardImpl board;
-    private View view;
+    private ViewImpl view;
     private GameStateManagerImpl gameStateManager;
     private BotControllerImpl botController;
     private PhysicsEngineImpl physicsEngine;
 
-    public GameLoop(ViewModelImpl viewModel, BoardImpl board, View view) {
+    public GameLoop(ViewModelImpl viewModel, BoardImpl board, ViewImpl view) {
         this.viewModel = viewModel;
         this.board = board;
         this.view = view;

@@ -17,7 +17,7 @@ public class PooolGame {
         board.init(boardConf);
         var buffer = new BoundedBufferImpl<Integer>(5);
         ViewModelImpl viewModel = new ViewModelImpl();
-        View view = new View(viewModel, 1200, 800, buffer);
+        ViewImpl view = new ViewImpl(viewModel, 1200, 800, buffer);
         var gameLoop = new GameLoop(viewModel, board, view);
         var inputReader = new InputReaderImpl(board, buffer);
         gameLoop.start();
