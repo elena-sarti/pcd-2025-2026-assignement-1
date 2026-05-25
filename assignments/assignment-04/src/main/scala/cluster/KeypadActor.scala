@@ -16,14 +16,13 @@ object KeypadActor:
   def apply(): Behavior[Command] = Behaviors.setup: context =>
     //initializing sharding on this node
     val sharding = ClusterSharding(context.system)
-    
     Behaviors.receiveMessage:
-      case Pin(pin, zones*) =>
+      case Pin(pin, zones) =>
         context.log.info("Pin inserted...")
         if pin == PIN then
           context.log.info("Correct pin!")
           //retrieving the alarm system ref through the sharding
           val alarmControlSystemActor = sharding.entityRefFor(AlarmControlSystem.TypeKey, "Alarm-control-unit")
-          alarmControlSystemActor ! AlarmControlSystemActor.PinInserted(zones*)
+          alarmControlSystemActor ! AlarmControlSystem.PinInserted(zones)
         else context.log.info("Wrong pin - try again")
         Behaviors.same
