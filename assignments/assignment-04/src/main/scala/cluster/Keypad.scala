@@ -14,7 +14,7 @@ object Keypad:
   final case class Pin(pin: String, zonesToArm: List[String]) extends Command
 
   def apply(entityId: String): Behavior[Command] = Behaviors.setup: context =>
-    //initializing sharding on this node
+    //retrieving the istance running the sharding on this node
     val sharding = ClusterSharding(context.system)
     Behaviors.receiveMessage:
       case Pin(pin, zones) =>
