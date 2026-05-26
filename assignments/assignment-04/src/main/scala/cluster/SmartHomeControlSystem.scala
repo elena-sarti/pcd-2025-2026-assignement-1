@@ -54,17 +54,17 @@ object SmartHomeControlSystem:
             keypadRef ! Keypad.Pin("0000", List())
             Behaviors.same
           case InsertPin =>
-            context.log.info("[SIMULATION] -> Action: Submitting correct PIN to arm 'Day-Zone'")
+            context.log.info("[SIMULATION] -> Action: Submitting correct PIN to arm Living Room")
             val keypadRef = sharding.entityRefFor(Keypad.TypeKey, "keypad-entrance")
-            keypadRef ! Keypad.Pin("0001", List("LIVING ROOM"))
+            keypadRef ! Keypad.Pin("0000", List("LIVING ROOM"))
             Behaviors.same
           case TriggerUnarmedZone =>
-            context.log.info("[SIMULATION] -> Action: Motion detected in Kitchen ('Kitchen-Zone' is not armed)")
+            context.log.info("[SIMULATION] -> Action: Motion detected in Perimeter")
             val sensorRef = sharding.entityRefFor(Sensor.TypeKey, "MOTION")
             sensorRef ! Sensor.Signal("PERIMETER")
             Behaviors.same
           case TriggerArmedZone =>
-            context.log.info("[SIMULATION] -> Action: Motion detected in Living Room ('Day-Zone' is armed!)")
+            context.log.info("[SIMULATION] -> Action: Motion detected in Living Room")
             val sensorRef = sharding.entityRefFor(Sensor.TypeKey, "DOOR")
             sensorRef ! Sensor.Signal("LIVING ROOM")
             Behaviors.same

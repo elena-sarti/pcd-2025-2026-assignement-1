@@ -87,6 +87,6 @@ object AlarmControlSystem:
     context.log.info("ATTENTION! CURRENTLY IN ALARM STATUS!")
     context.log.info("ALARM!")
     Behaviors.receiveMessage:
-      case PinInserted(_*) =>
+      case PinInserted(_) =>
         disarmed()
       case _ => Behaviors.same
