@@ -60,12 +60,12 @@ object SmartHomeControlSystem:
             Behaviors.same
           case TriggerUnarmedZone =>
             context.log.info("[SIMULATION] -> Action: Motion detected in Perimeter")
-            val sensorRef = sharding.entityRefFor(Sensor.TypeKey, "MOTION")
+            val sensorRef = sharding.entityRefFor(Sensor.TypeKey, "motion-perimeter")
             sensorRef ! Sensor.Signal("PERIMETER")
             Behaviors.same
           case TriggerArmedZone =>
             context.log.info("[SIMULATION] -> Action: Motion detected in Living Room")
-            val sensorRef = sharding.entityRefFor(Sensor.TypeKey, "DOOR")
+            val sensorRef = sharding.entityRefFor(Sensor.TypeKey, "door-living room")
             sensorRef ! Sensor.Signal("LIVING ROOM")
             Behaviors.same
     else
@@ -76,7 +76,7 @@ object SmartHomeControlSystem:
   def main(args: Array[String]): Unit =
     val ports =
       if args.nonEmpty then args.toSeq.map(_.toInt)
-      else sys.env.get("CLUSTER_PORT").flatMap(_.toIntOption).map(Seq(_)).getOrElse(Seq(25251, 25252, 0))
+      else sys.env.get("CLUSTER_PORT").flatMap(_.toIntOption).map(Seq(_)).getOrElse(Seq(25251, 25252, 0, 0))
 
     ports.foreach(startup)
 
