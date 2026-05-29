@@ -32,7 +32,7 @@ public class CSMiddleware {
 
         DeliverCallback csExitCallback = (processTag, delivery) -> {
             String processQueue = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println("[*] Process " + processQueue + " exited from CS.");
+            System.out.println("[*] Process " + processQueue.substring(14) + " exited from CS.");
             channel.basicPublish(NO_EXCHANGE, QUEUE_TOKEN, null, token.getBytes(StandardCharsets.UTF_8));
             System.out.println("[*] No process is now in CS.");
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
@@ -40,17 +40,17 @@ public class CSMiddleware {
 
         DeliverCallback csRequestCallback = (processTag, delivery) -> {
             String processQueue = new String(delivery.getBody(), StandardCharsets.UTF_8);
-            System.out.println("[*] Received CS request by process " + processQueue);
+            System.out.println("[*] Received CS request by process " + processQueue.substring(14));
             GetResponse tok = channel.basicGet(QUEUE_TOKEN, false);
             if (tok != null) {
                 channel.queueDeclare(processQueue, true, false, false, null);
                 String requestAccepted = "Permission to enter CS gained.";
                 channel.basicPublish(NO_EXCHANGE, processQueue, null, requestAccepted.getBytes(StandardCharsets.UTF_8));
-                System.out.println("[*] Permission to enter CS sent to " + processQueue);
+                System.out.println("[*] Permission to enter CS sent to process " + processQueue.substring(14));
                 channel.basicAck(tok.getEnvelope().getDeliveryTag(), false);
             } else {
                 try {
-                    System.out.println("[*] CS Busy. Requeuing request from " + processQueue);
+                    System.out.println("[*] CS Busy. Requeuing request from process " + processQueue.substring(14));
                     Thread.sleep(500);
                     channel.basicPublish(NO_EXCHANGE, QUEUE_CS_REQUEST, null, processQueue.getBytes(StandardCharsets.UTF_8));
                 } catch (InterruptedException e) {
