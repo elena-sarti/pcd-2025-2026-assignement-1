@@ -6,6 +6,7 @@ import tasks.model.BoardImpl;
 import java.util.ArrayList;
 
 public interface ViewModel {
+
     void update(BoardImpl board, GameStateManagerImpl gameStateManager, int framePerSec);
 
     ArrayList<BallViewInfo> getBalls();

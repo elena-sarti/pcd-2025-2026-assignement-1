@@ -11,10 +11,10 @@ import java.awt.event.WindowEvent;
 
 public class ViewFrame extends JFrame {
     
-    private VisualiserPanel panel;
-    private ViewModelImpl model;
-    private RenderSynch sync;
-    private BoundedBufferImpl<Integer> inputBuffer;
+    private final VisualiserPanel panel;
+    private final ViewModelImpl model;
+    private final RenderSynch sync;
+    private final BoundedBufferImpl<Integer> inputBuffer;
     
     public ViewFrame(ViewModelImpl model, int w, int h, BoundedBufferImpl<Integer> buffer){
     	this.model = model;

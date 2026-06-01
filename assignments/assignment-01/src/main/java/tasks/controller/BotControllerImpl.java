@@ -19,7 +19,7 @@ public class BotControllerImpl implements BotController {
     private long kickBotBall(BallImpl b, List<Hole> holes) {
         for (Hole h : holes) {
             if (b.distFromHole(h) < 1) {
-                V2d v = new V2d(b.getPos().x() - h.getPos().x(), b.getPos().y() - h.getPos().y())
+                V2d v = new V2d(b.getPos().x() - h.pos().x(), b.getPos().y() - h.pos().y())
                         .getNormalized().mul(0.75);
                 b.kick(v);
                 return System.currentTimeMillis();

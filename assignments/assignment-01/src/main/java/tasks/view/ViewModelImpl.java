@@ -7,10 +7,10 @@ import java.util.ArrayList;
 
 public class ViewModelImpl implements ViewModel {
 
-	private ArrayList<BallViewInfo> balls;
+	private final ArrayList<BallViewInfo> balls;
 	private BallViewInfo player;
     private BallViewInfo bot;
-    private ArrayList<BallViewInfo> holes;
+    private final ArrayList<BallViewInfo> holes;
 	private int framePerSec;
     private int playerScore = 0;
     private int botScore = 0;
@@ -31,7 +31,7 @@ public class ViewModelImpl implements ViewModel {
         this.endMessage = gameStateManager.getEndMessage();
         holes.clear();
         for (var h: board.getHoles()) {
-            holes.add(new BallViewInfo(h.getPos(), h.getRadius()));
+            holes.add(new BallViewInfo(h.pos(), h.radius()));
         }
 		balls.clear();
 		for (var b: board.getBalls()) {

@@ -6,10 +6,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class CountDownLatchImpl implements CountDownLatch {
 
-    private int nProcs;
+    private final int nProcs;
     private int nProcsDone = 0;
-    private Lock lock;
-    private Condition allDone;
+    private final Lock lock;
+    private final Condition allDone;
 
     public CountDownLatchImpl(int nProcs) {
         this.nProcs = nProcs;

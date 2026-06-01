@@ -9,19 +9,17 @@ public class ResolveCollisionsTask implements ResolveCollisions {
 
     private final int id;
     private final int nTasks;
-    private SpatialGridImpl spatialGrid;
-    private BallImpl pb;
-    private BallImpl bb;
-    private List<Hole> holes;
-    private CountDownLatchImpl latch;
-    private CountMonitor counterMonitor;
+    private final SpatialGridImpl spatialGrid;
+    private final BallImpl pb;
+    private final BallImpl bb;
+    private final List<Hole> holes;
+    private final CountDownLatchImpl latch;
 
-    public ResolveCollisionsTask(BoardImpl board, CountMonitor counterMonitor, int id, int nTasks, CountDownLatchImpl latch) {
+    public ResolveCollisionsTask(BoardImpl board, int id, int nTasks, CountDownLatchImpl latch) {
         this.pb = board.getPlayerBall();
         this.bb = board.getBotBall();
         this.holes = board.getHoles();
         this.spatialGrid = board.getGrid();
-        this.counterMonitor = counterMonitor;
         this.id = id;
         this.nTasks = nTasks;
         this.latch = latch;

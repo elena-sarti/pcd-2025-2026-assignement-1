@@ -7,8 +7,8 @@ import threads.model.V2d;
 import static java.awt.event.KeyEvent.*;
 
 public class InputReaderImpl extends Thread implements InputReader {
+
     BoundedBufferImpl<Integer> buffer;
-    private int cmd;
     BoardImpl board;
 
     public InputReaderImpl(BoardImpl board, BoundedBufferImpl<Integer> buffer){
@@ -20,7 +20,7 @@ public class InputReaderImpl extends Thread implements InputReader {
     public void run(){
         while(true){
             try {
-                cmd = buffer.get();
+                int cmd = buffer.get();
                 resolveCmd(this.board.getPlayerBall(), cmd);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

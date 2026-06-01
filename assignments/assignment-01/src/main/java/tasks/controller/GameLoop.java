@@ -6,12 +6,12 @@ import tasks.view.ViewModelImpl;
 
 public class GameLoop extends Thread {
 
-    private ViewModelImpl viewModel;
-    private BoardImpl board;
-    private ViewImpl view;
-    private GameStateManagerImpl gameStateManager;
-    private BotControllerImpl botController;
-    private PhysicsEngineImpl physicsEngine;
+    private final ViewModelImpl viewModel;
+    private final BoardImpl board;
+    private final ViewImpl view;
+    private final GameStateManagerImpl gameStateManager;
+    private final BotControllerImpl botController;
+    private final PhysicsEngineImpl physicsEngine;
 
     public GameLoop(ViewModelImpl viewModel, BoardImpl board, ViewImpl view) {
         this.viewModel = viewModel;

@@ -3,9 +3,10 @@ package tasks.controller;
 import tasks.model.*;
 
 public class GameStateManagerImpl implements GameStateManager {
+
     private boolean gameOver = false;
     private String endMessage = "";
-    private CountMonitor monitor = new CountMonitor();
+    private final CountMonitor monitor = new CountMonitor();
 
     @Override
     public void checkRules(BoardImpl board, PhysicsEngineImpl physics) {

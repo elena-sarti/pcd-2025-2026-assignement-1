@@ -6,7 +6,7 @@ import threads.model.*;
 public class GameStateManagerImpl implements GameStateManager {
     private boolean gameOver = false;
     private String endMessage = "";
-    private CountMonitor monitor = new CountMonitor();
+    private final CountMonitor monitor = new CountMonitor();
 
     @Override
     public void checkRules(BoardImpl board, PhysicsEngineImpl physics) {
@@ -21,13 +21,13 @@ public class GameStateManagerImpl implements GameStateManager {
             });
         }
         if (board.getPlayerBall().isInHole() || (board.getBalls().isEmpty() && monitor.getBotScore() > monitor.getPlayerScore())) {
-            setEnd("GAME OVER - you lost :(", physics);
+            setEnd("GAME OVER - you lost :(");
         } else if (board.getBotBall().isInHole() || board.getBalls().isEmpty()) {
-            setEnd("GAME OVER - YOU WON!", physics);
+            setEnd("GAME OVER - YOU WON!");
         }
     }
 
-    private void setEnd(String msg, PhysicsEngineImpl physics) {
+    private void setEnd(String msg) {
         this.gameOver = true;
         this.endMessage = msg;
     }

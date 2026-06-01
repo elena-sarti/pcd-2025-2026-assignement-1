@@ -8,11 +8,11 @@ import java.util.List;
 
 public class PhysicsEngineImpl implements PhysicsEngine {
 
-    private List<CollisionWorker> collisionWorkers = new ArrayList<>();
-    private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
-    private CollisionMonitor collisionMonitor = new CollisionMonitor(nThreads);
+    private final int nThreads = Runtime.getRuntime().availableProcessors() + 1;
+    private final CollisionMonitor collisionMonitor = new CollisionMonitor(nThreads);
 
     public PhysicsEngineImpl(BoardImpl board, GameStateManagerImpl stateManager) {
+        List<CollisionWorker> collisionWorkers = new ArrayList<>();
         for(int i = 0; i < nThreads; i++){
             collisionWorkers.add(new CollisionWorker(board, collisionMonitor, stateManager.getCountMonitor(), i, nThreads));
         }

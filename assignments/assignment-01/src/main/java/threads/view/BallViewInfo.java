@@ -3,6 +3,7 @@ package threads.view;
 import threads.model.P2d;
 
 public class BallViewInfo {
+
     private P2d pos;
     private double radius;
 

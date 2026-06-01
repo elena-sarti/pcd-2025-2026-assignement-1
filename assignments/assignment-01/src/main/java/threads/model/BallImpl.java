@@ -5,16 +5,16 @@ import java.util.List;
 
 public class BallImpl implements Ball {
 
+
+    private static final double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
+    private static final double RESTITUTION_FACTOR = 1;
+
     private P2d pos;
     private V2d vel;
-    private double radius;
-    private double mass;
+    private final double radius;
+    private final double mass;
     private volatile boolean inHole = false;
     private String lastToCollide = "";
-
-    private static double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
-    private static double RESTITUTION_FACTOR = 1;
-
 
     public BallImpl(P2d pos, double radius, double mass, V2d vel){
         this.pos = pos;
@@ -135,10 +135,10 @@ public class BallImpl implements Ball {
 
     @Override
     public double distFromHole(Hole h){
-        double dx = pos.x() - h.getPos().x();
-        double dy = pos.y() - h.getPos().y();
+        double dx = pos.x() - h.pos().x();
+        double dy = pos.y() - h.pos().y();
         double distSq = dx*dx + dy*dy; // we use the squares for velocity
-        double minFoundDist = Math.pow(h.getRadius() + this.radius, 2);
+        double minFoundDist = Math.pow(h.radius() + this.radius, 2);
         return distSq - minFoundDist;
     }
 

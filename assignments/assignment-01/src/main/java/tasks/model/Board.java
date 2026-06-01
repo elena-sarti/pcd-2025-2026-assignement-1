@@ -3,6 +3,7 @@ package tasks.model;
 import java.util.List;
 
 public interface Board {
+
     void init(BoardConf conf);
 
     List<BallImpl> getBalls();

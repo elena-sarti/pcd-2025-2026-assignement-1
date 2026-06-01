@@ -41,6 +41,6 @@ public class BoundedBufferImpl<Item> implements BoundedBuffer<Item> {
 	}
 
 	private boolean isEmpty() {
-		return buffer.size() == 0;
+		return buffer.isEmpty();
 	}
 }

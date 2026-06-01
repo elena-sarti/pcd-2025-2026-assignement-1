@@ -5,6 +5,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class CollisionMonitor {
+
     private final int nThreads;
     private int nFinished = 0;
     private boolean startSignal = false;

@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class PhysicsEngineImpl implements PhysicsEngine {
+
     private final ExecutorService exec;
     private final int nTasks = Runtime.getRuntime().availableProcessors() * 2;
 
@@ -24,7 +25,7 @@ public class PhysicsEngineImpl implements PhysicsEngine {
         board.getGrid().rebuild(board.getBalls());
         CountDownLatchImpl latch = new CountDownLatchImpl(nTasks);
         for(int i = 0; i < nTasks; i++){
-            exec.execute(new ResolveCollisionsTask(board, stateManager.getMonitor(), i, nTasks, latch));
+            exec.execute(new ResolveCollisionsTask(board, i, nTasks, latch));
         }
         try {
             latch.await();

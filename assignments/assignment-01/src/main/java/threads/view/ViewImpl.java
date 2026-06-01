@@ -4,12 +4,10 @@ import threads.controller.BoundedBufferImpl;
 
 public class ViewImpl implements View {
 
-	private ViewFrame frame;
-	private ViewModelImpl viewModel;
-    private BoundedBufferImpl<Integer> buffer;
+	private final ViewFrame frame;
+	private final ViewModelImpl viewModel;
 	
 	public ViewImpl(ViewModelImpl model, int w, int h, BoundedBufferImpl<Integer> buffer) {
-        this.buffer = buffer;
 		frame = new ViewFrame(model, w, h, buffer);
 		frame.setVisible(true);
 		this.viewModel = model;

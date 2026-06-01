@@ -1,6 +1,5 @@
 package threads.controller;
 
-import threads.model.Ball;
 import threads.model.BallImpl;
 import threads.model.BoardImpl;
 import threads.model.Hole;
@@ -15,9 +14,9 @@ public class CollisionWorker extends Thread {
     private final BoardImpl board;
     private final int id;
     private final int nThreads;
-    private BallImpl pb;
-    private BallImpl bb;
-    private List<Hole> holes;
+    private final BallImpl pb;
+    private final BallImpl bb;
+    private final List<Hole> holes;
 
     public CollisionWorker(BoardImpl board, CollisionMonitor collisionMonitor, CountMonitor counterMonitor, int id, int nThreads) {
         this.board = board;

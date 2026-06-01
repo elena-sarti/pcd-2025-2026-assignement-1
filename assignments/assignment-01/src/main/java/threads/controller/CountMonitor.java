@@ -1,6 +1,7 @@
 package threads.controller;
 
 public class CountMonitor {
+
     private int countPlayer = 0;
     private int countBot = 0;
 
