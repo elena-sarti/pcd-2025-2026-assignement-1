@@ -54,16 +54,6 @@ public class CollisionWorker extends Thread {
                 for (BallImpl b1 : cellSnapshot) {
                     if (b1 == null || b1.isInHole()) continue;
                     checkLocalCollisions(b1, r, c);
-                    if (b1.isInHole()) continue;
-                    //in order to access the method safely, we need to get the lock on the playerball
-                    synchronized(pb) {
-                        pb.resolveCollision(b1, pb, "player");
-                    }
-                    if (checkAndHandleHole(b1)) continue;
-                    //the same applies also to solve the collision with the botball
-                    synchronized(bb) {
-                        bb.resolveCollision(b1, bb, "bot");
-                    }
                     checkAndHandleHole(b1);
                 }
             }
