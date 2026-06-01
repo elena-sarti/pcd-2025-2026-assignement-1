@@ -1,49 +1,47 @@
-package tasks.controller;
-
-import tasks.model.*;
+package threads.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResolveCollisionsTask implements ResolveCollisions {
+public class CollisionWorker extends Thread {
 
+    private final CollisionMonitor collisionMonitor;
+    private final CountMonitor counterMonitor;
+    private final BoardImpl board;
     private final int id;
-    private final int nTasks;
-    private final SpatialGridImpl spatialGrid;
+    private final int nThreads;
     private final BallImpl pb;
     private final BallImpl bb;
     private final List<Hole> holes;
-    private final CountDownLatchImpl latch;
 
-    public ResolveCollisionsTask(BoardImpl board, int id, int nTasks, CountDownLatchImpl latch) {
+    public CollisionWorker(BoardImpl board, CollisionMonitor collisionMonitor, CountMonitor counterMonitor, int id, int nThreads) {
+        this.board = board;
+        this.collisionMonitor = collisionMonitor;
+        this.counterMonitor = counterMonitor;
+        this.id = id;
+        this.nThreads = nThreads;
         this.pb = board.getPlayerBall();
         this.bb = board.getBotBall();
         this.holes = board.getHoles();
-        this.spatialGrid = board.getGrid();
-        this.id = id;
-        this.nTasks = nTasks;
-        this.latch = latch;
     }
 
     public void run() {
-        try {
+        while (true) {
+            collisionMonitor.waitForOrder();
             resolveCollisionInMySlice();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            latch.countDown();
+            collisionMonitor.notifyWorkDone();
         }
     }
 
     private void resolveCollisionInMySlice() {
-        int totalRows = spatialGrid.getRows();
-        int rowsPerThread = totalRows / nTasks;
-        int remainder = totalRows % nTasks;
+        int totalRows = board.getGrid().getRows();
+        int rowsPerThread = totalRows / nThreads;
+        int remainder = totalRows % nThreads;
         int startRow = id * rowsPerThread + Math.min(id, remainder);
         int endRow = startRow + rowsPerThread + (id < remainder ? 1 : 0);
         for (int r = startRow; r < endRow; r++) {
-            for (int c = 0; c < spatialGrid.getCols(); c++) {
-                List<BallImpl> currentCell = spatialGrid.getGridCell(r, c);
+            for (int c = 0; c < board.getGrid().getCols(); c++) {
+                List<BallImpl> currentCell = board.getGrid().getGridCell(r, c);
                 List<BallImpl> cellSnapshot;
                 //need to have a copy of the currentCell to do operations on, otherwise other threads could access it at the same time => race conditions
                 synchronized(currentCell){
@@ -62,7 +60,7 @@ public class ResolveCollisionsTask implements ResolveCollisions {
         // the check is made with the current cell and the 8 that are beside it.
         for (int dr = -1; dr <= 1; dr++) {
             for (int dc = -1; dc <= 1; dc++) {
-                List<BallImpl> cell = spatialGrid.getGridCell(r + dr, c + dc);
+                List<BallImpl> cell = board.getGrid().getGridCell(r + dr, c + dc);
                 List<BallImpl> snapshot;
                 synchronized(cell){
                     snapshot = new ArrayList<>(cell);
@@ -87,6 +85,7 @@ public class ResolveCollisionsTask implements ResolveCollisions {
     private boolean checkAndHandleHole(BallImpl b) {
         if (b.checkInHole(holes)) {
             b.setInHole(true);
+            counterMonitor.inc(b.getLastToCollide());
             return true;
         }
         return false;

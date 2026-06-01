@@ -1,6 +1,6 @@
 package jpf;
 
-import threads.controller.CollisionMonitor;
+import threads.model.CollisionMonitor;
 
 public class CollisionMonitorTest {
     public static void main(String[] args) {

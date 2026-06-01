@@ -27,15 +27,16 @@ public class ViewFrame extends JFrame {
         getContentPane().add(panel);
         addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent ev){
-				System.exit(-1);
+				System.exit(0);
 			}
 			public void windowClosed(WindowEvent ev){
-				System.exit(-1);
+				System.exit(0);
 			}
 		});
         this.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyPressed(KeyEvent e) {try {
+            public void keyPressed(KeyEvent e) {
+                try {
                     inputBuffer.put(e.getKeyCode());
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();

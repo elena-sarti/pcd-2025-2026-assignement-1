@@ -1,4 +1,4 @@
-package threads.controller;
+package tasks.model;
 
 public class CountMonitor {
 

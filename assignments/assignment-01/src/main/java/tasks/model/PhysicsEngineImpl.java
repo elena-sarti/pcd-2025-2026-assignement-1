@@ -1,24 +1,17 @@
-package threads.controller;
+package tasks.model;
 
-import threads.model.*;
+import tasks.controller.GameStateManagerImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PhysicsEngineImpl implements PhysicsEngine {
 
-    private final int nThreads = Runtime.getRuntime().availableProcessors() + 1;
-    private final CollisionMonitor collisionMonitor = new CollisionMonitor(nThreads);
+    private final ExecutorService exec;
+    private final int nTasks = Runtime.getRuntime().availableProcessors() * 2;
 
-    public PhysicsEngineImpl(BoardImpl board, GameStateManagerImpl stateManager) {
-        List<CollisionWorker> collisionWorkers = new ArrayList<>();
-        for(int i = 0; i < nThreads; i++){
-            collisionWorkers.add(new CollisionWorker(board, collisionMonitor, stateManager.getCountMonitor(), i, nThreads));
-        }
-        for(CollisionWorker worker: collisionWorkers){
-            worker.start();
-        }
+    public PhysicsEngineImpl() {
+        this.exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
     }
 
     @Override
@@ -30,13 +23,25 @@ public class PhysicsEngineImpl implements PhysicsEngine {
         board.getBotBall().updateState(dt, board);
         board.getBalls().forEach(b -> b.updateState(dt, board));
         board.getGrid().rebuild(board.getBalls());
-        collisionMonitor.startResolvingCollisions();
-        collisionMonitor.waitForCollisionsToBeResolved();
+        CountDownLatchImpl latch = new CountDownLatchImpl(nTasks);
+        for(int i = 0; i < nTasks; i++){
+            exec.execute(new ResolveCollisionsTask(board, i, nTasks, latch));
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         board.getBalls().forEach(b -> {
             board.getPlayerBall().resolveCollision(b, board.getPlayerBall(), "player");
             board.getBotBall().resolveCollision(b, board.getBotBall(), "bot");
         });
         board.getPlayerBall().resolveCollision(board.getBotBall(), board.getPlayerBall(), "");
         stateManager.checkRules(board, this);
+    }
+
+    @Override
+    public void shutdown() {
+        exec.shutdown();
     }
 }

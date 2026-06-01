@@ -1,6 +1,6 @@
-package tasks.controller;
+package tasks.model;
 
-import tasks.model.BoardImpl;
+import tasks.controller.GameStateManagerImpl;
 
 public interface PhysicsEngine {
 

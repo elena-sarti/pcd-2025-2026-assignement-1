@@ -1,4 +1,4 @@
-package tasks.controller;
+package tasks.model;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

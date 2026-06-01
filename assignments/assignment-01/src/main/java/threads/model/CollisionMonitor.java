@@ -1,4 +1,4 @@
-package threads.controller;
+package threads.model;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

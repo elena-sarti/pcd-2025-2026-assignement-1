@@ -4,7 +4,8 @@ import tasks.model.*;
 
 import static java.awt.event.KeyEvent.*;
 
-public class InputReaderImpl extends Thread implements InputReader {
+public class InputReaderImpl implements InputReader {
+
     BoundedBufferImpl<Integer> buffer;
     BoardImpl board;
 
@@ -15,12 +16,12 @@ public class InputReaderImpl extends Thread implements InputReader {
 
     @Override
     public void run(){
-        while(true){
+        while(!Thread.currentThread().isInterrupted()){
             try {
                 int cmd = buffer.get();
                 resolveCmd(this.board.getPlayerBall(), cmd);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.currentThread().interrupt();
             }
         }
     }
