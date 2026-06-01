@@ -1,5 +1,6 @@
 package threads.controller;
 
+import threads.model.Ball;
 import threads.model.BallImpl;
 import threads.model.BoardImpl;
 import threads.model.Hole;
@@ -57,12 +58,12 @@ public class CollisionWorker extends Thread {
                     if (b1.isInHole()) continue;
                     //in order to access the method safely, we need to get the lock on the playerball
                     synchronized(pb) {
-                        BallImpl.resolveCollision(b1, pb, "player");
+                        pb.resolveCollision(b1, pb, "player");
                     }
                     if (checkAndHandleHole(b1)) continue;
                     //the same applies also to solve the collision with the botball
                     synchronized(bb) {
-                        BallImpl.resolveCollision(b1, bb, "bot");
+                        bb.resolveCollision(b1, bb, "bot");
                     }
                     checkAndHandleHole(b1);
                 }
@@ -87,7 +88,7 @@ public class CollisionWorker extends Thread {
                     BallImpl second = (first == b1) ? b2 : b1;
                     synchronized(first){
                         synchronized(second) {
-                            BallImpl.resolveCollision(b1, b2, "");
+                            b1.resolveCollision(b1, b2, "");
                         }
                     }
                     if (checkAndHandleHole(b1)) return;

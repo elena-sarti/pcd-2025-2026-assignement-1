@@ -20,9 +20,7 @@ public class PhysicsEngineImpl implements PhysicsEngine {
         }
         board.getPlayerBall().updateState(dt, board);
         board.getBotBall().updateState(dt, board);
-        synchronized(board.getBalls()) {
-            board.getBalls().forEach(b -> b.updateState(dt, board));
-        }
+        board.getBalls().forEach(b -> b.updateState(dt, board));
         board.getGrid().rebuild(board.getBalls());
         CountDownLatchImpl latch = new CountDownLatchImpl(nTasks);
         for(int i = 0; i < nTasks; i++){
@@ -33,7 +31,7 @@ public class PhysicsEngineImpl implements PhysicsEngine {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        BallImpl.resolveCollision(board.getBotBall(), board.getPlayerBall(), "");
+        board.getPlayerBall().resolveCollision(board.getBotBall(), board.getPlayerBall(), "");
         stateManager.checkRules(board, this);
     }
 
