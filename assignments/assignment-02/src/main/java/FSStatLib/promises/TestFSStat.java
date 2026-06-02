@@ -7,8 +7,7 @@ public class TestFSStat {
         Vertx vertx = Vertx.vertx();
         FSStat library = new FSStat(vertx);
         String d = "D:\\Elena";
-        library
-            .getFSReport(d, 300, 3)
-            .onSuccess(report -> System.out.println(report.toString()));
+        library.getFSReport(d, 300, 3)
+                .onSuccess(report -> System.out.println(report.toString()));
     }
 }
