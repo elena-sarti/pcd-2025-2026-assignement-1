@@ -67,31 +67,29 @@ public class TestFFStatExtension {
             int numBands = Integer.parseInt(nB.getText());
             results.append("Generating report for directory " + d + ":\n");
             istogram.updateIstogram(new int[numBands + 1]);
-            lib
-            .getFSReport(d, maxSize, numBands)
-            .onSuccess(report -> {
-                if (!lib.getStopped()) {
-                    SwingUtilities.invokeLater(() -> {
-                        istogram.updateIstogram(lib.getLastUpdate().fileSizesDistribution());
-                        results.append(report.toString() + "\n");
-                        lib.setStopped(true);
-                    });
-                }
-            })
-            .onFailure(err -> {
-                vertx.cancelTimer(timer);
-            });
-            timer = vertx
-                    .setPeriodic(30, t -> {
-                        Report lastUpdate = lib.getLastUpdate();
-                        if (!lib.getStopped()) {
-                            SwingUtilities.invokeLater(() -> {
-                                istogram.updateIstogram(lastUpdate.fileSizesDistribution());
-                            });
-                        } else {
-                            vertx.cancelTimer(t);
-                        }
-                    });
+            lib.getFSReport(d, maxSize, numBands)
+                .onSuccess(report -> {
+                    if (!lib.getStopped()) {
+                        SwingUtilities.invokeLater(() -> {
+                            istogram.updateIstogram(lib.getLastUpdate().fileSizesDistribution());
+                            results.append(report.toString() + "\n");
+                            lib.setStopped(true);
+                        });
+                    }
+                })
+                .onFailure(err -> {
+                    vertx.cancelTimer(timer);
+                });
+            timer = vertx.setPeriodic(30, t -> {
+                    Report lastUpdate = lib.getLastUpdate();
+                    if (!lib.getStopped()) {
+                        SwingUtilities.invokeLater(() -> {
+                            istogram.updateIstogram(lastUpdate.fileSizesDistribution());
+                        });
+                    } else {
+                        vertx.cancelTimer(t);
+                    }
+                });
         });
 
         stopButton.addActionListener(stopPressed -> {

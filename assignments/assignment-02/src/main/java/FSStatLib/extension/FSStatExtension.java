@@ -9,11 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class FSStatExtension implements FSStatLibExtension {
 
     private final FileSystem fs;
-    private Report lastUpdate;
+    private final AtomicReference<Report> lastUpdate = new AtomicReference<>();
     private final AtomicBoolean stopped = new AtomicBoolean(false);
 
     public FSStatExtension(Vertx vertx) {
@@ -22,7 +23,7 @@ public class FSStatExtension implements FSStatLibExtension {
 
     @Override
     public Future<Report> getFSReport(String d, int maxFS, int nB){
-        lastUpdate = new Report(0, new int[nB + 1]);
+        lastUpdate.set(new Report(0, new int[nB + 1]));
         return getReport(d, maxFS, nB);
     }
 
@@ -33,7 +34,7 @@ public class FSStatExtension implements FSStatLibExtension {
                 .recover(err -> {
                     if (!stopped.get()) {
                         System.err.println("Access error - directory: " + d + " - Cause: " + err.getMessage());
-                        return Future.succeededFuture(Collections.<String>emptyList());
+                        return Future.succeededFuture(Collections.emptyList());
                     } else {
                         return Future.failedFuture("Operation stopped by user");
                     }
@@ -52,7 +53,7 @@ public class FSStatExtension implements FSStatLibExtension {
                                                 return getReport(file, maxFS, nB);
                                             } else if (props.isRegularFile()) {
                                                 Report localReport = createFileReport(props.size(), maxFS, nB);
-                                                lastUpdate = mergeReports(localReport, lastUpdate);
+                                                lastUpdate.updateAndGet(currentReport -> mergeReports(localReport, currentReport));
                                                 return Future.succeededFuture(localReport);
                                             }
                                             return Future.succeededFuture();
@@ -121,6 +122,6 @@ public class FSStatExtension implements FSStatLibExtension {
 
     @Override
     public Report getLastUpdate() {
-        return lastUpdate;
+        return lastUpdate.get();
     }
 }

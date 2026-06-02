@@ -10,20 +10,23 @@ import java.util.stream.Stream;
 import io.reactivex.rxjava3.core.*;
 
 import FSStatLib.Report;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class FSStat implements FSStatLib {
 
     @Override
     public Observable<Report> getFSReport(String d, int maxFS, int nB){
         //creating a cold observable with .create()
-        return Observable.<File>create(emitter -> {
+        Observable<File> source = Observable.create(emitter -> {
                     try {
                         addFiles(emitter, d);
                         emitter.onComplete();
                     } catch (Exception e) {
                         emitter.onError(e);
                     }
-                })
+                });
+        return source
+                .subscribeOn(Schedulers.io())
                 .map(file -> createFileReport(file.length(), maxFS, nB))
                 .scan(this::mergeReports)
                 .lastElement()
@@ -32,19 +35,20 @@ public class FSStat implements FSStatLib {
 
     private void addFiles(ObservableEmitter<File> source, String path) throws IOException {
         System.out.println("Checking directory " + path);
-        Stream<Path> paths = Files.list(Paths.get(path));
-        paths.forEach(p ->{
-            System.out.println("Found file " + p);
-            if (p.toFile().isFile()) {
-                source.onNext(p.toFile());
-            } else {
-                try {
-                    addFiles(source, p.toString());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+        try (Stream<Path> paths = Files.list(Paths.get(path))) {
+            paths.forEach(p -> {
+                System.out.println("Found file " + p);
+                if (p.toFile().isFile()) {
+                    source.onNext(p.toFile());
+                } else {
+                    try {
+                        addFiles(source, p.toString());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private Report createFileReport(long fileSize, int maxFS, int numBands) {

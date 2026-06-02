@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,24 +22,28 @@ public class FFStat implements FFStatLib {
             Report totalReport = new Report(0, new int[nB + 1]);
             System.out.println("Checking directory " + d);
             Path path = Paths.get(d);
+            List<Future<Report>> localReports = new ArrayList<>();
             try (Stream<Path> stream = Files.list(path)) {
                 List<Path> paths = stream.toList();
                 for (Path p : paths) {
                     if (p.toFile().isDirectory()) {
                         Future<Report> reportFuture = getFSReport(p.toFile().toString(), maxFS, nB);
-                        try {
-                            Report localReport = reportFuture.get();
-                            totalReport = mergeReports(totalReport, localReport);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+                        localReports.add(reportFuture);
                     } else {
                         Report localReport = createFileReport(p.toFile().length(), maxFS, nB);
                         totalReport = mergeReports(totalReport, localReport);
                     }
                 }
-            ;} catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+            for (Future<Report> report : localReports) {
+                try {
+                    Report localReport = report.get();
+                    totalReport = mergeReports(totalReport, localReport);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
             return totalReport;
         });
