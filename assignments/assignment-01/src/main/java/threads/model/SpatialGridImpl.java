@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SpatialGridImpl implements SpatialGrid {
+
     private final int rows, cols;
     private final ArrayList<BallImpl>[][] grid;
     private final Boundary bounds;

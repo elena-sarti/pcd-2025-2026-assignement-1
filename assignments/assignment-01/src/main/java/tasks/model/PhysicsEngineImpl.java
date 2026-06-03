@@ -33,10 +33,10 @@ public class PhysicsEngineImpl implements PhysicsEngine {
             Thread.currentThread().interrupt();
         }
         board.getBalls().forEach(b -> {
-            board.getPlayerBall().resolveCollision(b, board.getPlayerBall(), "player");
-            board.getBotBall().resolveCollision(b, board.getBotBall(), "bot");
+            BoardImpl.resolveCollision(b, board.getPlayerBall(), "player");
+            BoardImpl.resolveCollision(b, board.getBotBall(), "bot");
         });
-        board.getPlayerBall().resolveCollision(board.getBotBall(), board.getPlayerBall(), "");
+        BoardImpl.resolveCollision(board.getBotBall(), board.getPlayerBall(), "");
         stateManager.checkRules(board, this);
     }
 

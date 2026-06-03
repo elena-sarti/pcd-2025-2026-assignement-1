@@ -39,6 +39,7 @@ public class CollisionMonitor {
             }
             startSignal = false;
         } catch (InterruptedException ex) {
+            ex.printStackTrace();
         } finally {
             lock.unlock();
         }
@@ -51,6 +52,7 @@ public class CollisionMonitor {
                 readyToStart.await();
             }
         } catch (InterruptedException ex) {
+            ex.printStackTrace();
         } finally {
             lock.unlock();
         }
@@ -64,6 +66,7 @@ public class CollisionMonitor {
                 allFinished.signal();
             }
         } catch (RuntimeException ex) {
+            ex.printStackTrace();
         } finally {
             lock.unlock();
         }

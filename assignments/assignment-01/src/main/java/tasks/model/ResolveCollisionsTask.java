@@ -8,14 +8,10 @@ public class ResolveCollisionsTask implements ResolveCollisions {
     private final int id;
     private final int nTasks;
     private final SpatialGridImpl spatialGrid;
-    private final BallImpl pb;
-    private final BallImpl bb;
     private final List<Hole> holes;
     private final CountDownLatchImpl latch;
 
     public ResolveCollisionsTask(BoardImpl board, int id, int nTasks, CountDownLatchImpl latch) {
-        this.pb = board.getPlayerBall();
-        this.bb = board.getBotBall();
         this.holes = board.getHoles();
         this.spatialGrid = board.getGrid();
         this.id = id;
@@ -73,7 +69,7 @@ public class ResolveCollisionsTask implements ResolveCollisions {
                     BallImpl second = (first == b1) ? b2 : b1;
                     synchronized(first){
                         synchronized(second) {
-                            b1.resolveCollision(b1, b2, "");
+                            BoardImpl.resolveCollision(b1, b2, "");
                         }
                     }
                     if (checkAndHandleHole(b1)) return;

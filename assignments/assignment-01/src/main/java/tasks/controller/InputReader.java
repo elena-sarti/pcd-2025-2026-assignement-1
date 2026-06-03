@@ -21,7 +21,7 @@ public class InputReader extends Thread {
         while(!Thread.currentThread().isInterrupted()){
             try {
                 int cmd = buffer.get();
-                resolveCmd(this.board.getPlayerBall(), cmd);
+                resolveCmd(board.getPlayerBall(), cmd);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -29,24 +29,13 @@ public class InputReader extends Thread {
     }
 
     private void resolveCmd(BallImpl playerBall, int cmd){
-        V2d vel = playerBall.getVel();
-        V2d newVel;
-        switch(cmd){
-            case VK_UP:
-                newVel = new V2d(0, 0.1);
-                break;
-            case VK_DOWN:
-                newVel = new V2d(0, -0.1);
-                break;
-            case VK_LEFT:
-                newVel = new V2d(-0.1, 0);
-                break;
-            case VK_RIGHT:
-                newVel = new V2d(0.1, 0);
-                break;
-            default:
-                return;
-        }
-        playerBall.kick(vel.sum(newVel));
+        V2d delta = switch(cmd){
+            case VK_UP    -> new V2d(0,  0.1);
+            case VK_DOWN  -> new V2d(0, -0.1);
+            case VK_LEFT  -> new V2d(-0.1, 0);
+            case VK_RIGHT -> new V2d(0.1,  0);
+            default -> null;
+        };
+        if (delta != null) playerBall.applyImpulse(delta);
     }
 }

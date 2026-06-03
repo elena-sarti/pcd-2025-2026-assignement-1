@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 public class BotControllerImpl implements BotController {
+
     private long lastKickTime = System.currentTimeMillis();
 
     @Override
