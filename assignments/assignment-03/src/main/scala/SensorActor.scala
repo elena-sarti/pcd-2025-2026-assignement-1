@@ -3,7 +3,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 
 object SensorActor:
 
-  import AlarmControlSystemActor.Notification
+  import AlarmControllerActor.Notification
 
   enum Signal:
     case DoorWindowSignal(zone: String, replyTo: ActorRef[Notification])

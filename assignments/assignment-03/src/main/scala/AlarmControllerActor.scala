@@ -3,7 +3,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 
 import scala.concurrent.duration.DurationInt
 
-object AlarmControlSystemActor:
+object AlarmControllerActor:
 
   val EXIT_DELAY = 6
   val ENTRY_DELAY = 2

@@ -17,7 +17,7 @@ object Guardian:
     context =>
       val controller = context.spawn(
         Behaviors
-          .supervise(AlarmControlSystemActor())
+          .supervise(AlarmControllerActor())
           .onFailure[Exception](SupervisorStrategy.restart),
           "alarm-controller",
       )

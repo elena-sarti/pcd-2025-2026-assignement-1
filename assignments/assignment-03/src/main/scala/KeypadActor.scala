@@ -3,7 +3,7 @@ import org.apache.pekko.actor.typed.scaladsl.Behaviors
 
 object KeypadActor:
 
-  import AlarmControlSystemActor.Notification
+  import AlarmControllerActor.Notification
 
   val PIN = "0000"
 
