@@ -1,6 +1,6 @@
 name := "assignment-3"
 version := "0.1"
-scalaVersion := "3.3.3" // O 2.13.12
+scalaVersion := "3.3.3"
 
 val pekkoVersion = "1.0.2"
 
