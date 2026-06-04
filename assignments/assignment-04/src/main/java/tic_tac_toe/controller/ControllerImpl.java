@@ -19,9 +19,23 @@ public class ControllerImpl implements Controller {
     }
 
     public void addAdversary(RemoteController adversary){
-        this.adversary = adversary;
-        System.out.println("Player connected: the game starts!");
-        myTurn();
+        boolean accepted = false;
+        synchronized (this) {
+            if (this.adversary == null) {
+                this.adversary = adversary;
+                accepted = true;
+            }
+        }
+        if (accepted) {
+            System.out.println("Player connected: the game starts!");
+            myTurn();
+        } else {
+            try {
+                adversary.receiveMessage(new Message("Sorry, someone else is already playing! Try again later."));
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void writeO(int r, int c) {
