@@ -27,9 +27,9 @@ object SmartHomeControlSystem:
       Keypad(entityContext.entityId)
     )
 
-    val alarmControlSystemEntity = sharding.init(Entity(typeKey = AlarmControlSystem.TypeKey): entityContext =>
+    val alarmControlSystemEntity = sharding.init(Entity(typeKey = AlarmController.TypeKey): entityContext =>
       Behaviors
-        .supervise(AlarmControlSystem(entityContext.entityId))
+        .supervise(AlarmController(entityContext.entityId))
         .onFailure[Exception](supervisorStrategy)
     )
 

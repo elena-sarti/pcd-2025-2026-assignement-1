@@ -18,6 +18,6 @@ object Sensor:
     Behaviors.receiveMessage:
       case Signal(zone) =>
         context.log.info(s"$sensorType sensor in zone $zone triggered!")
-        val alarmControlSystemActor = sharding.entityRefFor(AlarmControlSystem.TypeKey, "Alarm-control-unit")
-        alarmControlSystemActor ! AlarmControlSystem.MotionDetected(zone, entityId)
+        val alarmControlSystemActor = sharding.entityRefFor(AlarmController.TypeKey, "Alarm-control-unit")
+        alarmControlSystemActor ! AlarmController.MotionDetected(zone, entityId)
         Behaviors.same

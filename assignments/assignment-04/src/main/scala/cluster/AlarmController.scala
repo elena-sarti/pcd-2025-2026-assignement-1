@@ -8,7 +8,7 @@ import org.apache.pekko.cluster.sharding.typed.scaladsl.EntityTypeKey
 
 import scala.concurrent.duration.DurationInt
 
-object AlarmControlSystem:
+object AlarmController:
   val EXIT_DELAY = 6
   val ENTRY_DELAY = 2
 

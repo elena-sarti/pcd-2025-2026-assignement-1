@@ -22,7 +22,7 @@ object Keypad:
         if pin == PIN then
           context.log.info("Correct pin!")
           //retrieving the alarm system ref through the sharding
-          val alarmControlSystemActor = sharding.entityRefFor(AlarmControlSystem.TypeKey, "Alarm-control-unit")
-          alarmControlSystemActor ! AlarmControlSystem.PinInserted(zones)
+          val alarmControlSystemActor = sharding.entityRefFor(AlarmController.TypeKey, "Alarm-control-unit")
+          alarmControlSystemActor ! AlarmController.PinInserted(zones)
         else context.log.info("Wrong pin - try again")
         Behaviors.same
