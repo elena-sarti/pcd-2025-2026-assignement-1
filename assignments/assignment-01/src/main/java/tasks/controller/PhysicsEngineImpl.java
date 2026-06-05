@@ -1,6 +1,8 @@
-package tasks.model;
+package tasks.controller;
 
-import tasks.controller.GameStateManagerImpl;
+import tasks.model.BoardImpl;
+import tasks.model.CountDownLatchImpl;
+import tasks.model.ResolveCollisionsTask;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

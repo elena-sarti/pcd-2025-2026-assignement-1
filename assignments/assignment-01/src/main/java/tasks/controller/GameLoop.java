@@ -1,7 +1,6 @@
 package tasks.controller;
 
 import tasks.model.BoardImpl;
-import tasks.model.PhysicsEngineImpl;
 import tasks.view.ViewImpl;
 import tasks.view.ViewModelImpl;
 

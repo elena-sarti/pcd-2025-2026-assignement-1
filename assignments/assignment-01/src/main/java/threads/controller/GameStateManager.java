@@ -2,7 +2,6 @@ package threads.controller;
 
 import threads.model.BoardImpl;
 import threads.model.CountMonitor;
-import threads.model.PhysicsEngineImpl;
 
 public interface GameStateManager {
 

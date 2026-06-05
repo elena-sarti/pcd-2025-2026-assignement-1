@@ -2,7 +2,6 @@ package tasks.controller;
 
 import tasks.model.BoardImpl;
 import tasks.model.CountMonitor;
-import tasks.model.PhysicsEngineImpl;
 
 public interface GameStateManager {
 

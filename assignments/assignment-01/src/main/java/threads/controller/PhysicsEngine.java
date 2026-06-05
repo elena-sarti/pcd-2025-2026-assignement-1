@@ -1,6 +1,6 @@
-package threads.model;
+package threads.controller;
 
-import threads.controller.GameStateManagerImpl;
+import threads.model.BoardImpl;
 
 public interface PhysicsEngine {
 

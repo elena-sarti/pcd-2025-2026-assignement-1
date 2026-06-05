@@ -1,6 +1,8 @@
-package threads.model;
+package threads.controller;
 
-import threads.controller.GameStateManagerImpl;
+import threads.model.BoardImpl;
+import threads.model.CollisionMonitor;
+import threads.model.CollisionWorker;
 
 import java.util.ArrayList;
 import java.util.List;
