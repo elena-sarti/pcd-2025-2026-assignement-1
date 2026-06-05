@@ -15,8 +15,8 @@ object KeypadActor:
     Behaviors.receiveMessage:
       case Pin(pin, replyTo, zones*) =>
         context.log.info("Pin inserted...")
-        if pin == PIN then {
+        if pin == PIN then
           context.log.info("Correct pin!")
           replyTo ! Notification.PinInserted(zones*)
-        } else context.log.info("Wrong pin - try again")
+        else context.log.info("Wrong pin - try again")
         Behaviors.same
