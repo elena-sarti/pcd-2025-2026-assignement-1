@@ -37,7 +37,6 @@ public class ProcessA {
             channel.basicPublish(NO_EXCHANGE, QUEUE_CS_EXIT, null, MY_PRIVATE_QUEUE.getBytes(StandardCharsets.UTF_8));
 
             channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-            channel.basicCancel(consumerTag);
         };
 
         channel.basicConsume(MY_PRIVATE_QUEUE, false, permissionCallback, t -> {});
