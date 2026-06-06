@@ -20,19 +20,19 @@ public class CollisionWorker extends Thread {
     }
 
     public void run() {
-        while (true) {
-            collisionMonitor.waitForOrder();
-            resolveCollisionInMySlice();
-            collisionMonitor.notifyWorkDone();
-        }
-    }
-
-    private void resolveCollisionInMySlice() {
         int totalRows = board.getGrid().getRows();
         int rowsPerThread = totalRows / nThreads;
         int remainder = totalRows % nThreads;
         int startRow = id * rowsPerThread + Math.min(id, remainder);
         int endRow = startRow + rowsPerThread + (id < remainder ? 1 : 0);
+        while (!Thread.currentThread().isInterrupted()) {
+            collisionMonitor.waitForOrder();
+            resolveCollisionInMySlice(startRow, endRow);
+            collisionMonitor.notifyWorkDone();
+        }
+    }
+
+    private void resolveCollisionInMySlice(int startRow, int endRow) {
         for (int r = startRow; r < endRow; r++) {
             for (int c = 0; c < board.getGrid().getCols(); c++) {
                 List<BallImpl> currentCell = board.getGrid().getGridCell(r, c);
@@ -51,7 +51,7 @@ public class CollisionWorker extends Thread {
     }
 
     private void checkLocalCollisions(BallImpl b1, int r, int c) {
-        // the check is made with the current cell and the 8 that are beside it.
+        // the check is made with the current cell and the 8 that are beside it
         for (int dr = -1; dr <= 1; dr++) {
             for (int dc = -1; dc <= 1; dc++) {
                 List<BallImpl> cell = board.getGrid().getGridCell(r + dr, c + dc);
