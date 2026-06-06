@@ -46,12 +46,12 @@ public class ViewModelImpl implements ViewModel {
 	
 	@Override
     public synchronized ArrayList<BallViewInfo> getBalls(){
-        return new ArrayList<BallViewInfo>(balls);
+        return new ArrayList<>(balls);
 	}
 
     @Override
     public synchronized ArrayList<BallViewInfo> getHoles(){
-        return new ArrayList<BallViewInfo>(holes);
+        return new ArrayList<>(holes);
     }
 
 	@Override
