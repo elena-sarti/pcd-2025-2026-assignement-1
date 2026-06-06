@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-public class FFStat implements FFStatLib {
+public class FSStatLib implements FSStat {
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override

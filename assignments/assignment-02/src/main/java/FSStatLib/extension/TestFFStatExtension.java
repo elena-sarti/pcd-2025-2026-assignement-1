@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class TestFFStatExtension {
     static Vertx vertx = Vertx.vertx();
-    static FSStatExtension lib = new FSStatExtension(vertx);
+    static FSStatLibExtension lib = new FSStatLibExtension(vertx);
     static long timer;
 
     public static void gui(){
