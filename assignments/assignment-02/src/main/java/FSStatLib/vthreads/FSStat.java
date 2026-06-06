@@ -5,5 +5,6 @@ import FSStatLib.Report;
 import java.util.concurrent.Future;
 
 public interface FSStat {
+
     Future<Report> getFSReport(String d, int maxFS, int nB);
 }

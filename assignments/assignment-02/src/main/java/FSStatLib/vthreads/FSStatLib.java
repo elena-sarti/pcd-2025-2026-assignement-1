@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 public class FSStatLib implements FSStat {
+
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override

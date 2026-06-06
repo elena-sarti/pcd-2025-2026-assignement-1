@@ -1,7 +1,6 @@
 package FSStatLib.reactive;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,39 +15,33 @@ public class FSStatLib implements FSStat {
 
     @Override
     public Observable<Report> getFSReport(String d, int maxFS, int nB){
-        //creating a cold observable with .create()
-        Observable<File> source = Observable.create(emitter -> {
-                    try {
-                        addFiles(emitter, d);
-                        emitter.onComplete();
-                    } catch (Exception e) {
-                        emitter.onError(e);
-                    }
-                });
-        return source
-                .subscribeOn(Schedulers.io())
+        return scanDirectory(Paths.get(d))
                 .map(file -> createFileReport(file.length(), maxFS, nB))
                 .scan(this::mergeReports)
                 .lastElement()
                 .toObservable();
     }
 
-    private void addFiles(ObservableEmitter<File> source, String path) throws IOException {
-        System.out.println("Checking directory " + path);
-        try (Stream<Path> paths = Files.list(Paths.get(path))) {
-            paths.forEach(p -> {
-                System.out.println("Found file " + p);
-                if (p.toFile().isFile()) {
-                    source.onNext(p.toFile());
-                } else {
-                    try {
-                        addFiles(source, p.toString());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+    private Observable<File> scanDirectory(Path path) {
+        System.out.println("Reading directory: " + path);
+        //creating a cold observable with .create()
+        return Observable.<Path>create(emitter -> {
+                    try (Stream<Path> paths = Files.list(path)) {
+                        paths.forEach(emitter::onNext);
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
                     }
-                }
-            });
-        }
+                })
+                .subscribeOn(Schedulers.io())
+                .flatMap(p -> {
+                    System.out.println("Checking: " + p);
+                    if (p.toFile().isDirectory()) {
+                        return scanDirectory(p);
+                    } else {
+                        return Observable.just(p.toFile());
+                    }
+                });
     }
 
     private Report createFileReport(long fileSize, int maxFS, int numBands) {

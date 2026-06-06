@@ -36,10 +36,10 @@ public class FSStatLib implements FSStat {
                                 .compose(props -> {
                                     if (props.isDirectory()) {
                                         return getFSReport(file, maxFS, nB);
-                                    } else if (props.isRegularFile()) {
+                                    } else {
+                                        //Future.succeededFuture() creates a promise that has already been completed - it does not launch any operations in background
                                         return Future.succeededFuture(createFileReport(props.size(), maxFS, nB));
                                     }
-                                    return Future.succeededFuture();
                                 })
                                 .recover(err ->
                                         Future.succeededFuture(new Report(0, new int[nB + 1])))

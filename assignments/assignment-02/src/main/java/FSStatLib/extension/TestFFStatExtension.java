@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TestFFStatExtension {
+
     static Vertx vertx = Vertx.vertx();
     static FSStatLibExtension lib = new FSStatLibExtension(vertx);
     static long timer;
@@ -130,6 +131,7 @@ public class TestFFStatExtension {
     }
 
     static class IstogramPanel extends JPanel {
+
         private int[] reportData;
 
         public IstogramPanel(int[] reportData) {

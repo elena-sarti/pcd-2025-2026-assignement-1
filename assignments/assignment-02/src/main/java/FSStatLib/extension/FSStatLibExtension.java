@@ -51,12 +51,11 @@ public class FSStatLibExtension implements FSStatExtension {
                                         if (!stopped.get()) {
                                             if (props.isDirectory()) {
                                                 return getReport(file, maxFS, nB);
-                                            } else if (props.isRegularFile()) {
+                                            } else {
                                                 Report localReport = createFileReport(props.size(), maxFS, nB);
                                                 lastUpdate.updateAndGet(currentReport -> mergeReports(localReport, currentReport));
                                                 return Future.succeededFuture(localReport);
                                             }
-                                            return Future.succeededFuture();
                                         } else {
                                             return Future.failedFuture("Operation stopped by user");
                                         }
