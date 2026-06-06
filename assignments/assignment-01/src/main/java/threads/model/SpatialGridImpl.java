@@ -27,6 +27,7 @@ public class SpatialGridImpl implements SpatialGrid {
         double rangeX = bounds.x1() - bounds.x0();
         for (BallImpl b : balls) {
             if (b.isInHole()) continue;
+            //mapping the ball's coordinates to some indices of the grid - the ball will we part of the cell with those indices
             int r = Math.max(0, Math.min((int)(((bounds.y1() - b.getPos().y()) / rangeY) * rows), rows - 1));
             int c = Math.max(0, Math.min((int)(((b.getPos().x() - bounds.x0()) / rangeX) * cols), cols - 1));
             grid[r][c].add(b);
@@ -34,11 +35,10 @@ public class SpatialGridImpl implements SpatialGrid {
     }
 
     private void clear() {
-        for (int r = 0; r < rows; r++) {
+        for (int r = 0; r < rows; r++)
             for (int c = 0; c < cols; c++) {
                 grid[r][c].clear();
             }
-        }
     }
 
     @Override
