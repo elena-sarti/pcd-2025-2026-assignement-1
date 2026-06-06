@@ -18,7 +18,7 @@ public class GameLoop extends Thread {
         this.view = view;
         this.gameStateManager = new GameStateManagerImpl();
         this.botController = new BotControllerImpl();
-        this.physicsEngine = new PhysicsEngineImpl(board, gameStateManager);
+        this.physicsEngine = new PhysicsEngineImpl(board);
     }
 
     public void run() {
@@ -29,7 +29,8 @@ public class GameLoop extends Thread {
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
             lastUpdateTime = System.currentTimeMillis();
             botController.update(board);
-            physicsEngine.update(board, gameStateManager, elapsed);
+            physicsEngine.update(board, elapsed);
+            gameStateManager.checkRules(board, physicsEngine);
             nFrames++;
             int framePerSec = 0;
             long dt = (System.currentTimeMillis() - t0);

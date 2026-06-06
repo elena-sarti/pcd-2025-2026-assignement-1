@@ -4,7 +4,7 @@ import java.util.List;
 
 public class BallImpl implements Ball {
 
-    public static final double FRICTION_FACTOR = 0.25; 	/* 0 minimum */
+    public static final double FRICTION_FACTOR = 0.1; 	/* 0 minimum */
     public static final double RESTITUTION_FACTOR = 1;
 
     private P2d pos;

@@ -4,7 +4,7 @@ import tasks.model.BoardImpl;
 
 public interface PhysicsEngine {
 
-    void update(BoardImpl board, GameStateManagerImpl stateManager, long dt);
+    void update(BoardImpl board, long dt);
 
     void shutdown();
 }

@@ -55,19 +55,6 @@ public class BoardImpl implements Board {
         return grid;
     }
 
-    private static void setCollider(BallImpl a, BallImpl b, String colliderType){
-        // if b has a defined ball type, b is either the player or the bot => need to update a lastToCollide
-        if (colliderType.equals("bot")){
-            a.setLastToCollide("bot");
-        } else if (colliderType.equals("player")) {
-            a.setLastToCollide("player");
-        } else {
-            // if the colliderType is neither "bot" nor "player", we need to reset both a and b last collider
-            a.setLastToCollide("");
-            b.setLastToCollide("");
-        }
-    }
-
     public static void resolveCollision(BallImpl a, BallImpl b, String ballType) {
         if (a.isInHole()) return;
         /* check if there is a collision */
@@ -109,6 +96,19 @@ public class BoardImpl implements Board {
                 a.kick(new V2d(a.getVel().x() - (imp / a.getMass()) * nx, a.getVel().y() - (imp / a.getMass()) * ny));
                 b.kick(new V2d(b.getVel().x() + (imp / b.getMass()) * nx, b.getVel().y() + (imp / b.getMass()) * ny));
             }
+        }
+    }
+
+    private static void setCollider(BallImpl a, BallImpl b, String colliderType){
+        // if b has a defined ball type, b is either the player or the bot => need to update a lastToCollide
+        if (colliderType.equals("bot")){
+            a.setLastToCollide("bot");
+        } else if (colliderType.equals("player")) {
+            a.setLastToCollide("player");
+        } else {
+            // if the colliderType is neither "bot" nor "player", we need to reset both a and b last collider
+            a.setLastToCollide("");
+            b.setLastToCollide("");
         }
     }
 }

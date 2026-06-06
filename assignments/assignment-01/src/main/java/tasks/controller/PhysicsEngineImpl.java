@@ -17,10 +17,7 @@ public class PhysicsEngineImpl implements PhysicsEngine {
     }
 
     @Override
-    public void update(BoardImpl board, GameStateManagerImpl stateManager, long dt) {
-        if (stateManager.isGameOver()) {
-            return;
-        }
+    public void update(BoardImpl board, long dt) {
         board.getPlayerBall().updateState(dt, board);
         board.getBotBall().updateState(dt, board);
         board.getBalls().forEach(b -> b.updateState(dt, board));
@@ -39,7 +36,6 @@ public class PhysicsEngineImpl implements PhysicsEngine {
             BoardImpl.resolveCollision(b, board.getBotBall(), "bot");
         });
         BoardImpl.resolveCollision(board.getBotBall(), board.getPlayerBall(), "");
-        stateManager.checkRules(board, this);
     }
 
     @Override

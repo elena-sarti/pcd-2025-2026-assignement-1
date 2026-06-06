@@ -30,7 +30,8 @@ public class GameLoop extends Thread {
             long elapsed = System.currentTimeMillis() - lastUpdateTime;
             lastUpdateTime = System.currentTimeMillis();
             botController.update(board);
-            physicsEngine.update(board, gameStateManager, elapsed);
+            physicsEngine.update(board, elapsed);
+            gameStateManager.checkRules(board, physicsEngine);
             nFrames++;
             int framePerSec = 0;
             long dt = (System.currentTimeMillis() - t0);

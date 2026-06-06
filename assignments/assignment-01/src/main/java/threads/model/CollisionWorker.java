@@ -6,16 +6,14 @@ import java.util.List;
 public class CollisionWorker extends Thread {
 
     private final CollisionMonitor collisionMonitor;
-    private final CountMonitor counterMonitor;
     private final BoardImpl board;
     private final int id;
     private final int nThreads;
     private final List<Hole> holes;
 
-    public CollisionWorker(BoardImpl board, CollisionMonitor collisionMonitor, CountMonitor counterMonitor, int id, int nThreads) {
+    public CollisionWorker(BoardImpl board, CollisionMonitor collisionMonitor, int id, int nThreads) {
         this.board = board;
         this.collisionMonitor = collisionMonitor;
-        this.counterMonitor = counterMonitor;
         this.id = id;
         this.nThreads = nThreads;
         this.holes = board.getHoles();
@@ -81,7 +79,6 @@ public class CollisionWorker extends Thread {
     private boolean checkAndHandleHole(BallImpl b) {
         if (b.checkInHole(holes)) {
             b.setInHole(true);
-            counterMonitor.inc(b.getLastToCollide());
             return true;
         }
         return false;

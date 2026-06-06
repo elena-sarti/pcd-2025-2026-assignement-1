@@ -15,7 +15,7 @@ public class PooolGame {
         var boardConf = new MassiveBoardConf();
         BoardImpl board = new BoardImpl();
         board.init(boardConf);
-        BoundedBufferImpl<Integer> buffer = new BoundedBufferImpl<Integer>(5);
+        BoundedBufferImpl<Integer> buffer = new BoundedBufferImpl<>(20);
         ViewModelImpl viewModel = new ViewModelImpl();
         ViewImpl view = new ViewImpl(viewModel, 1200, 800, buffer);
         GameLoop gameLoop = new GameLoop(viewModel, board, view);
