@@ -3,7 +3,7 @@ package tasks.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResolveCollisionsTask implements ResolveCollisions {
+public class ResolveCollisionsTask implements Runnable {
 
     private final int id;
     private final int nTasks;
@@ -20,21 +20,16 @@ public class ResolveCollisionsTask implements ResolveCollisions {
     }
 
     public void run() {
-        try {
-            resolveCollisionInMySlice();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            latch.countDown();
-        }
-    }
-
-    private void resolveCollisionInMySlice() {
         int totalRows = spatialGrid.getRows();
         int rowsPerThread = totalRows / nTasks;
         int remainder = totalRows % nTasks;
         int startRow = id * rowsPerThread + Math.min(id, remainder);
         int endRow = startRow + rowsPerThread + (id < remainder ? 1 : 0);
+        resolveCollisionInMySlice(startRow, endRow);
+        latch.countDown();
+    }
+
+    private void resolveCollisionInMySlice(int startRow, int endRow) {
         for (int r = startRow; r < endRow; r++) {
             for (int c = 0; c < spatialGrid.getCols(); c++) {
                 List<BallImpl> currentCell = spatialGrid.getGridCell(r, c);

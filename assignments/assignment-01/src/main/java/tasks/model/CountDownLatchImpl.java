@@ -25,6 +25,7 @@ public class CountDownLatchImpl implements CountDownLatch {
                 allDone.await();
             }
         } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             lock.unlock();
         }
