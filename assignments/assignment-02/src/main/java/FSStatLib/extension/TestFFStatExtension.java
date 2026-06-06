@@ -8,11 +8,11 @@ import java.awt.*;
 
 public class TestFFStatExtension {
 
-    static Vertx vertx = Vertx.vertx();
-    static FSStatLibExtension lib = new FSStatLibExtension(vertx);
-    static long timer;
+    private final Vertx vertx = Vertx.vertx();
+    private final FSStatLibExtension lib = new FSStatLibExtension(vertx);
+    private long timer;
 
-    public static void gui(){
+    public void gui(){
         JFrame frame = new JFrame("GUI");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 700);
@@ -193,7 +193,10 @@ public class TestFFStatExtension {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(TestFFStatExtension::gui);
+        SwingUtilities.invokeLater(() -> {
+            TestFFStatExtension app = new TestFFStatExtension();
+            app.gui();
+        });
     }
 }
 
